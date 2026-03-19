@@ -393,6 +393,17 @@
       max-width: 260px;
     }
 
+    .analysis-action-group {
+      min-width: auto;
+      max-width: none;
+      align-self: flex-end;
+    }
+
+    .analysis-display-btn {
+      min-width: 110px;
+      height: 33px;
+    }
+
     .analysis-filter-group .settings-label {
       margin-bottom: 0;
       font-size: 13px;
@@ -593,6 +604,10 @@
           <input type="radio" name="analysis" value="proizvod">
           <span class="radio-label">Производ</span>
         </label>
+        <label class="radio-item analysis-radio-item" data-analysis-section="proizvod_min">
+          <input type="radio" name="analysis" value="proizvod_min">
+          <span class="radio-label">Производ (мин)</span>
+        </label>
         <label class="radio-item analysis-radio-item" data-analysis-section="rating">
           <input type="radio" name="analysis" value="rating">
           <span class="radio-label">Рейтинг</span>
@@ -732,6 +747,19 @@
                     </div>
                   </div>
                   <div class="analysis-filter-group">
+                    <div class="settings-label">Часы</div>
+                    <div class="analysis-filter-dropdown" data-filter-key="hour">
+                      <button id="analysisFilterBtnHour" class="analysis-filter-btn" type="button">Часы: 0/0</button>
+                      <div id="analysisFilterMenuHour" class="analysis-filter-menu">
+                        <div class="analysis-filter-actions">
+                          <button id="analysisFilterAllHour" class="analysis-filter-action-btn" type="button">Все</button>
+                          <button id="analysisFilterNoneHour" class="analysis-filter-action-btn" type="button">Снять</button>
+                        </div>
+                        <div id="analysisFilterOptionsHour" class="analysis-filter-options"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="analysis-filter-group">
                     <div class="settings-label">Дата</div>
                     <div class="analysis-filter-dropdown" data-filter-key="date">
                       <button id="analysisFilterBtnDate" class="analysis-filter-btn" type="button">Дата: 0/0</button>
@@ -743,6 +771,9 @@
                         <div id="analysisFilterOptionsDate" class="analysis-filter-options"></div>
                       </div>
                     </div>
+                  </div>
+                  <div class="analysis-filter-group analysis-action-group">
+                    <button id="analysisDisplayBtn" class="btn btn-primary analysis-display-btn" type="button" style="display: none;">Отобразить</button>
                   </div>
                 </div>
                 <div id="analysis-message" class="directory-message" style="padding: 0; text-align: left; margin-top: 0;">Выберите раздел анализа в боковом меню.</div>
@@ -1454,8 +1485,12 @@
   const analysisTableWrapper = document.getElementById('analysis-table-wrapper');
   const analysisMessage = document.getElementById('analysis-message');
   const analysisChart = document.getElementById('analysisChart');
+  const analysisDisplayBtn = document.getElementById('analysisDisplayBtn');
 
   let proizvodRows = [];
+  let proizvodColumns = [];
+  let currentAnalysisMode = 'hour'; // 'hour' | 'minute'
+  let minuteDisplayActivated = false;
 
   const MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь',
                      'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
@@ -1469,6 +1504,7 @@
     year: { label: 'Год', field: 'Год', options: [], selected: new Set() },
     month: { label: 'Месяц', field: 'Месяц', options: [], selected: new Set() },
     work: { label: 'Работа', field: 'Work', options: [], selected: new Set() },
+    hour: { label: 'Часы', field: 'Час', options: [], selected: new Set() },
     date: { label: 'Дата', field: 'Дата', options: [], selected: new Set() }
   };
 
@@ -1500,6 +1536,13 @@
       options: document.getElementById('analysisFilterOptionsWork'),
       all: document.getElementById('analysisFilterAllWork'),
       none: document.getElementById('analysisFilterNoneWork')
+    },
+    hour: {
+      button: document.getElementById('analysisFilterBtnHour'),
+      menu: document.getElementById('analysisFilterMenuHour'),
+      options: document.getElementById('analysisFilterOptionsHour'),
+      all: document.getElementById('analysisFilterAllHour'),
+      none: document.getElementById('analysisFilterNoneHour')
     },
     date: {
       button: document.getElementById('analysisFilterBtnDate'),
@@ -1537,6 +1580,9 @@
       analysisFilterDom[key].menu.classList.remove('open');
     });
     proizvodRows = [];
+    proizvodColumns = [];
+    minuteDisplayActivated = false;
+    analysisDisplayBtn.style.display = 'none';
   }
 
   function setAnalysisMessage(text, isError = false) {
@@ -1596,6 +1642,10 @@
       return values.sort((a, b) => Number(a) - Number(b));
     }
 
+    if (key === 'hour') {
+      return values.sort((a, b) => Number(a) - Number(b));
+    }
+
     return values.sort((a, b) => a.localeCompare(b, 'ru'));
   }
 
@@ -1650,12 +1700,46 @@
     });
   }
 
+  function applyMinuteModeDefaults(rows) {
+    if (!rows.length) return;
+
+    const earliestRow = rows
+      .map(row => ({ row, date: parseRuDate((row['DateTimeStart'] || '').trim()) }))
+      .filter(item => item.date)
+      .sort((a, b) => a.date - b.date)[0]?.row;
+
+    if (!earliestRow) return;
+
+    const earliestMonth = (earliestRow['Месяц'] || '').trim();
+    const earliestDate = (earliestRow['Дата'] || '').trim();
+
+    if (earliestMonth && analysisFilterState.month.options.includes(earliestMonth)) {
+      analysisFilterState.month.selected = new Set([earliestMonth]);
+      renderAnalysisFilterOptions('month');
+      updateFilterButtonTitle('month');
+    }
+
+    if (earliestDate && analysisFilterState.date.options.includes(earliestDate)) {
+      analysisFilterState.date.selected = new Set([earliestDate]);
+      renderAnalysisFilterOptions('date');
+      updateFilterButtonTitle('date');
+    }
+  }
+
   function setFilterSelection(key, mode) {
     const state = analysisFilterState[key];
     state.selected = mode === 'all' ? new Set(state.options) : new Set();
     renderAnalysisFilterOptions(key);
     updateFilterButtonTitle(key);
-    renderProizvodChart();
+    renderCurrentChart();
+  }
+
+  function renderCurrentChart() {
+    if (currentAnalysisMode === 'minute') {
+      renderProizvodMinChart();
+    } else {
+      renderProizvodChart();
+    }
   }
 
   function buildHourlyChartPoints(rows) {
@@ -1663,6 +1747,7 @@
     const yearSelected = analysisFilterState.year.selected;
     const monthSelected = analysisFilterState.month.selected;
     const workSelected = analysisFilterState.work.selected;
+    const hourSelected = analysisFilterState.hour.selected;
     const dateSelected = analysisFilterState.date.selected;
     const hourSums = Array.from({ length: 25 }, (_, hour) => ({ hour, sum: 0 }));
 
@@ -1671,12 +1756,14 @@
       const year = (row['Год'] || '').trim();
       const month = (row['Месяц'] || '').trim();
       const work = (row['Work'] || '').trim();
+      const hour = (row['Час'] || '').trim();
       const date = (row['Дата'] || '').trim();
 
       if (!fioSelected.has(fio)) return;
       if (!yearSelected.has(year)) return;
       if (!monthSelected.has(month)) return;
       if (!workSelected.has(work)) return;
+      if (!hourSelected.has(hour)) return;
       if (!dateSelected.has(date)) return;
 
       const valueNum = Number(String(row['Value'] || '').replace(',', '.'));
@@ -1732,6 +1819,138 @@
     });
 
     setAnalysisMessage('График построен по часам 0..24.', false);
+  }
+
+  function buildMinuteChartPoints(rows) {
+    const fioSelected = analysisFilterState.fio.selected;
+    const yearSelected = analysisFilterState.year.selected;
+    const monthSelected = analysisFilterState.month.selected;
+    const workSelected = analysisFilterState.work.selected;
+    const hourSelected = analysisFilterState.hour.selected;
+    const dateSelected = analysisFilterState.date.selected;
+
+    const filteredRows = rows.filter(row => {
+      const fio = (row['FIO'] || '').trim();
+      const year = (row['Год'] || '').trim();
+      const month = (row['Месяц'] || '').trim();
+      const work = (row['Work'] || '').trim();
+      const hour = (row['Час'] || '').trim();
+      const date = (row['Дата'] || '').trim();
+
+      return fioSelected.has(fio)
+        && yearSelected.has(year)
+        && monthSelected.has(month)
+        && workSelected.has(work)
+        && hourSelected.has(hour)
+        && dateSelected.has(date);
+    });
+
+    if (!filteredRows.length) {
+      return [];
+    }
+
+    const valueMap = new Map();
+    filteredRows.forEach(row => {
+      const valueNum = Number(String(row['Value'] || '').replace(',', '.'));
+      if (!Number.isFinite(valueNum)) return;
+
+      const key = [
+        (row['Год'] || '').trim(),
+        (row['Месяц'] || '').trim(),
+        (row['Дата'] || '').trim(),
+        (row['Час'] || '').trim(),
+        (row['Минута'] || '').trim()
+      ].join('|');
+
+      valueMap.set(key, (valueMap.get(key) || 0) + valueNum);
+    });
+
+    const selectedHours = Array.from(hourSelected)
+      .map(value => Number(value))
+      .filter(value => Number.isFinite(value) && value >= 0 && value <= 24)
+      .sort((a, b) => a - b);
+
+    const dayGroups = Array.from(new Set(filteredRows.map(row => [
+      (row['Год'] || '').trim(),
+      (row['Месяц'] || '').trim(),
+      (row['Дата'] || '').trim()
+    ].join('|'))))
+      .map(key => {
+        const [year, month, date] = key.split('|');
+        return { year, month, date };
+      })
+      .sort((a, b) => {
+        if (a.year !== b.year) return Number(a.year) - Number(b.year);
+        const monthDiff = (MONTH_INDEX[a.month] ?? 99) - (MONTH_INDEX[b.month] ?? 99);
+        if (monthDiff !== 0) return monthDiff;
+        return Number(a.date) - Number(b.date);
+      });
+
+    const points = [];
+    dayGroups.forEach(group => {
+      selectedHours.forEach(hour => {
+        for (let minute = 0; minute < 60; minute++) {
+          const minuteLabel = pad2(minute);
+          const hourLabel = pad2(hour);
+          const key = [group.year, group.month, group.date, hourLabel, minuteLabel].join('|');
+          points.push({
+            year: group.year,
+            monthLabel: group.month,
+            dayLabel: group.date,
+            hourLabel,
+            minuteLabel,
+            sum: valueMap.get(key) || 0
+          });
+        }
+      });
+    });
+
+    return points;
+  }
+
+  function renderProizvodMinChart() {
+    analysisChart.innerHTML = '';
+
+    if (!proizvodRows.length) {
+      setAnalysisMessage('Нет данных для построения графика.', true);
+      return;
+    }
+
+    const points = buildMinuteChartPoints(proizvodRows);
+    if (!points.length) {
+      setAnalysisMessage('Нет данных для построения графика по выбранному фильтру.', true);
+      return;
+    }
+
+    const maxValue = Math.max(...points.map(p => p.sum), 1);
+
+    points.forEach(point => {
+      const item = document.createElement('div');
+      item.className = 'analysis-bar-item';
+
+      const value = document.createElement('div');
+      value.className = 'analysis-bar-value';
+      value.textContent = point.sum.toFixed(0);
+
+      const bar = document.createElement('div');
+      bar.className = 'analysis-bar';
+      const barHeightPx = point.sum > 0 ? Math.max(2, Math.round((point.sum / maxValue) * 180)) : 2;
+      bar.style.height = `${barHeightPx}px`;
+      bar.style.opacity = point.sum > 0 ? '1' : '0.2';
+      bar.title = `${point.monthLabel} ${point.dayLabel}, час ${point.hourLabel}, мин ${point.minuteLabel} | ${point.sum.toFixed(2)}`;
+
+      const label = document.createElement('div');
+      label.className = 'analysis-bar-label';
+      label.innerHTML = `<span>${point.monthLabel}</span><span>${point.dayLabel}</span><span>${point.hourLabel}</span><span>${point.minuteLabel}</span>`;
+
+      item.appendChild(value);
+      item.appendChild(bar);
+      item.appendChild(label);
+      analysisChart.appendChild(item);
+    });
+
+    const filled = points.filter(p => p.sum > 0).length;
+    setAnalysisMessage(`График построен по иерархии месяц → день → час → минута. Столбцов: ${points.length}, минут с данными: ${filled}.`, false);
   }
 
   async function loadProizvodData() {
@@ -1801,10 +2020,23 @@
       };
     });
 
-    renderAnalysisTable(outputCols, outputRows);
+    proizvodColumns = outputCols;
     proizvodRows = outputRows;
     fillAnalysisFilters(outputRows);
-    renderProizvodChart();
+
+    if (currentAnalysisMode === 'minute') {
+      applyMinuteModeDefaults(outputRows);
+      clearAnalysisView();
+      analysisChart.innerHTML = '';
+      minuteDisplayActivated = false;
+      analysisDisplayBtn.style.display = 'inline-flex';
+      setAnalysisMessage('Для режима «Производ (мин)» выберите фильтры и нажмите «Отобразить».', false);
+      return;
+    }
+
+    analysisDisplayBtn.style.display = 'none';
+    renderAnalysisTable(outputCols, outputRows);
+    renderCurrentChart();
     setAnalysisMessage(`Данные загружены из TEST ZAGRUZKA.csv. Строк: ${outputRows.length}.`, false);
   }
 
@@ -1842,8 +2074,17 @@
       }
 
       updateFilterButtonTitle(key);
-      renderProizvodChart();
+      if (!(currentAnalysisMode === 'minute' && !minuteDisplayActivated)) {
+        renderCurrentChart();
+      }
     });
+  });
+
+  analysisDisplayBtn.addEventListener('click', () => {
+    if (currentAnalysisMode !== 'minute') return;
+    minuteDisplayActivated = true;
+    renderAnalysisTable(proizvodColumns, proizvodRows);
+    renderCurrentChart();
   });
 
   document.addEventListener('click', (event) => {
@@ -1858,10 +2099,12 @@
       item.classList.add('active');
 
       const sectionKey = item.dataset.analysisSection;
-      const nameMap = { downtime: 'Простои', proizvod: 'Производ', rating: 'Рейтинг', inout: 'Приход/Уход' };
+      const nameMap = { downtime: 'Простои', proizvod: 'Производ', proizvod_min: 'Производ (мин)', rating: 'Рейтинг', inout: 'Приход/Уход' };
       analysisTitle.textContent = nameMap[sectionKey] || sectionKey;
 
-      if (sectionKey === 'proizvod') {
+      if (sectionKey === 'proizvod' || sectionKey === 'proizvod_min') {
+        currentAnalysisMode = sectionKey === 'proizvod_min' ? 'minute' : 'hour';
+        minuteDisplayActivated = currentAnalysisMode !== 'minute';
         await loadProizvodData();
       } else {
         clearAnalysisView();
