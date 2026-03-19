@@ -1,0 +1,4 @@
+DateTimeStart;login;FIO;ED_izm;Work;OperationID;Value;Valid;Type_OP;Type_stop
+DateTime;String(50);String(255);String(50);String(255);Integer;Integer;String(20);String(50);String(20)
+01.07.2026 18:05;38749;Ivanov II;SCHT;Picing;124;1;Y;CD/RV;N
+01.07.2026 18:06;38749;Ivanov II;SCHT;Picing;124;1;Y;CD/RV;N
