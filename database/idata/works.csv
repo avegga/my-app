@@ -1,3 +1,4 @@
-uid;login;family;name_long;date_born;sex;start_date;div;shift
-1230;38749;Ivanov II;Ivanov Ivan Ivanovich;01.01.2000;m;25.09.2025;picking;operator
-1229;5689;Petrov PP;Petrov Petr Petrovich;09.12.1983;m;01.07.2025;picking;operator
+ui;works;descroption;unit;type;type Stop
+1230;Пикиннг;Пикиннг;линия;CD/RV;NO
+1229;Упаковка;Упаковка;шт;CD/RV;NO
+1231;Проверка;Проверка;шт;CD/RV;NO
