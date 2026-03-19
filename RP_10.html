@@ -369,6 +369,173 @@
     .status { font-size: 12px; color: #6b7280; }
     .status-ok { color: #16a34a; }
     .status-error { color: #dc2626; }
+
+    .analysis-bottom-content {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 100%;
+      padding: 10px;
+    }
+
+    .analysis-filters {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .analysis-filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 170px;
+      max-width: 260px;
+    }
+
+    .analysis-filter-group .settings-label {
+      margin-bottom: 0;
+      font-size: 13px;
+    }
+
+    .analysis-filter-dropdown {
+      position: relative;
+    }
+
+    .analysis-filter-btn {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 12px;
+      text-align: left;
+      background: #ffffff;
+      cursor: pointer;
+      color: #111827;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .analysis-filter-btn:hover {
+      border-color: #9ca3af;
+    }
+
+    .analysis-filter-menu {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      box-shadow: 0 8px 20px rgba(17, 24, 39, 0.12);
+      display: none;
+      z-index: 20;
+    }
+
+    .analysis-filter-menu.open {
+      display: block;
+    }
+
+    .analysis-filter-actions {
+      display: flex;
+      gap: 6px;
+      padding: 8px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .analysis-filter-action-btn {
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      background: #ffffff;
+      color: #374151;
+    }
+
+    .analysis-filter-options {
+      max-height: 180px;
+      overflow: auto;
+      padding: 6px 8px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .analysis-filter-option {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: #111827;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .analysis-filter-option input[type="checkbox"] {
+      margin: 0;
+      accent-color: #2563eb;
+    }
+
+    .analysis-filter-empty {
+      font-size: 11px;
+      color: #6b7280;
+      padding: 6px 2px;
+    }
+
+    .analysis-chart-wrap {
+      flex: 1;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      background: #ffffff;
+      overflow: auto;
+      padding: 10px;
+    }
+
+    .analysis-chart {
+      min-height: 260px;
+      height: 100%;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      padding: 8px;
+      min-width: max-content;
+    }
+
+    .analysis-bar-item {
+      width: 46px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex: 0 0 46px;
+    }
+
+    .analysis-bar-value {
+      font-size: 11px;
+      color: #374151;
+      line-height: 1;
+    }
+
+    .analysis-bar {
+      width: 28px;
+      min-height: 2px;
+      border-radius: 4px 4px 0 0;
+      background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+    }
+
+    .analysis-bar-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 10px;
+      color: #4b5563;
+      line-height: 1.1;
+      text-align: center;
+      min-height: 34px;
+    }
   </style>
 </head>
 <body>
@@ -421,6 +588,10 @@
         <label class="radio-item analysis-radio-item active" data-analysis-section="downtime">
           <input type="radio" name="analysis" value="downtime" checked>
           <span class="radio-label">Простои</span>
+        </label>
+        <label class="radio-item analysis-radio-item" data-analysis-section="proizvod">
+          <input type="radio" name="analysis" value="proizvod">
+          <span class="radio-label">Производ</span>
         </label>
         <label class="radio-item analysis-radio-item" data-analysis-section="rating">
           <input type="radio" name="analysis" value="rating">
@@ -489,7 +660,99 @@
 
       <!-- ✅ ЗАКЛАДКА "АНАЛИЗ" -->
       <div id="analysis-tab" class="tab-content">
-        <div class="settings-content"></div>
+        <div class="upload-content">
+          <div id="analysisTopPanel" class="panel" style="flex-basis: 55%;">
+            <div class="panel-header">
+              <div id="analysis-title">Анализ</div>
+            </div>
+            <div class="panel-body">
+              <div id="analysis-table-wrapper" class="directory-table-wrapper"></div>
+            </div>
+          </div>
+
+          <div id="analysisSplitter" class="splitter" title="Потяните, чтобы изменить размер областей"></div>
+
+          <div id="analysisBottomPanel" class="panel" style="flex-basis: 45%;">
+            <div class="panel-header">
+              <div>График производительности</div>
+            </div>
+            <div class="panel-body">
+              <div class="analysis-bottom-content">
+                <div class="analysis-filters">
+                  <div class="analysis-filter-group">
+                    <div class="settings-label">Сотрудник</div>
+                    <div class="analysis-filter-dropdown" data-filter-key="fio">
+                      <button id="analysisFilterBtnFio" class="analysis-filter-btn" type="button">Сотрудник: 0/0</button>
+                      <div id="analysisFilterMenuFio" class="analysis-filter-menu">
+                        <div class="analysis-filter-actions">
+                          <button id="analysisFilterAllFio" class="analysis-filter-action-btn" type="button">Все</button>
+                          <button id="analysisFilterNoneFio" class="analysis-filter-action-btn" type="button">Снять</button>
+                        </div>
+                        <div id="analysisFilterOptionsFio" class="analysis-filter-options"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="analysis-filter-group">
+                    <div class="settings-label">Год</div>
+                    <div class="analysis-filter-dropdown" data-filter-key="year">
+                      <button id="analysisFilterBtnYear" class="analysis-filter-btn" type="button">Год: 0/0</button>
+                      <div id="analysisFilterMenuYear" class="analysis-filter-menu">
+                        <div class="analysis-filter-actions">
+                          <button id="analysisFilterAllYear" class="analysis-filter-action-btn" type="button">Все</button>
+                          <button id="analysisFilterNoneYear" class="analysis-filter-action-btn" type="button">Снять</button>
+                        </div>
+                        <div id="analysisFilterOptionsYear" class="analysis-filter-options"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="analysis-filter-group">
+                    <div class="settings-label">Месяц</div>
+                    <div class="analysis-filter-dropdown" data-filter-key="month">
+                      <button id="analysisFilterBtnMonth" class="analysis-filter-btn" type="button">Месяц: 0/0</button>
+                      <div id="analysisFilterMenuMonth" class="analysis-filter-menu">
+                        <div class="analysis-filter-actions">
+                          <button id="analysisFilterAllMonth" class="analysis-filter-action-btn" type="button">Все</button>
+                          <button id="analysisFilterNoneMonth" class="analysis-filter-action-btn" type="button">Снять</button>
+                        </div>
+                        <div id="analysisFilterOptionsMonth" class="analysis-filter-options"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="analysis-filter-group">
+                    <div class="settings-label">Работа</div>
+                    <div class="analysis-filter-dropdown" data-filter-key="work">
+                      <button id="analysisFilterBtnWork" class="analysis-filter-btn" type="button">Работа: 0/0</button>
+                      <div id="analysisFilterMenuWork" class="analysis-filter-menu">
+                        <div class="analysis-filter-actions">
+                          <button id="analysisFilterAllWork" class="analysis-filter-action-btn" type="button">Все</button>
+                          <button id="analysisFilterNoneWork" class="analysis-filter-action-btn" type="button">Снять</button>
+                        </div>
+                        <div id="analysisFilterOptionsWork" class="analysis-filter-options"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="analysis-filter-group">
+                    <div class="settings-label">Дата</div>
+                    <div class="analysis-filter-dropdown" data-filter-key="date">
+                      <button id="analysisFilterBtnDate" class="analysis-filter-btn" type="button">Дата: 0/0</button>
+                      <div id="analysisFilterMenuDate" class="analysis-filter-menu">
+                        <div class="analysis-filter-actions">
+                          <button id="analysisFilterAllDate" class="analysis-filter-action-btn" type="button">Все</button>
+                          <button id="analysisFilterNoneDate" class="analysis-filter-action-btn" type="button">Снять</button>
+                        </div>
+                        <div id="analysisFilterOptionsDate" class="analysis-filter-options"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div id="analysis-message" class="directory-message" style="padding: 0; text-align: left; margin-top: 0;">Выберите раздел анализа в боковом меню.</div>
+                <div class="analysis-chart-wrap">
+                  <div id="analysisChart" class="analysis-chart"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- ✅ ЗАКЛАДКА "ИНСТРУКЦИИ" -->
@@ -851,7 +1114,7 @@
   });
   document.addEventListener('mousemove', (e) => {
     if (!isResizing) return;
-    const container = document.querySelector('.upload-content');
+    const container = splitter.closest('.upload-content');
     const rect = container.getBoundingClientRect();
     const offsetY = e.clientY - rect.top;
     const min = 80;
@@ -859,6 +1122,33 @@
     const y = Math.min(Math.max(offsetY, min), max);
     topPanel.style.flexBasis = (y - 3) + 'px';
     bottomPanel.style.flexBasis = (rect.height - y - 3) + 'px';
+  });
+
+  const analysisTopPanel = document.getElementById('analysisTopPanel');
+  const analysisBottomPanel = document.getElementById('analysisBottomPanel');
+  const analysisSplitter = document.getElementById('analysisSplitter');
+
+  let isAnalysisResizing = false;
+  analysisSplitter.addEventListener('mousedown', () => {
+    isAnalysisResizing = true;
+    document.body.style.cursor = 'row-resize';
+  });
+  document.addEventListener('mouseup', () => {
+    isAnalysisResizing = false;
+    if (!isResizing) {
+      document.body.style.cursor = 'default';
+    }
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!isAnalysisResizing) return;
+    const container = analysisSplitter.closest('.upload-content');
+    const rect = container.getBoundingClientRect();
+    const offsetY = e.clientY - rect.top;
+    const min = 80;
+    const max = rect.height - 80;
+    const y = Math.min(Math.max(offsetY, min), max);
+    analysisTopPanel.style.flexBasis = (y - 3) + 'px';
+    analysisBottomPanel.style.flexBasis = (rect.height - y - 3) + 'px';
   });
 
   function validateValueByType(value, type) {
@@ -1156,6 +1446,429 @@
     renderTables();
     statusText.textContent = 'Результаты очищены';
     statusText.className = 'status';
+  });
+
+  // ========== АНАЛИЗ ==========
+  const analysisRadioItems = document.querySelectorAll('.analysis-radio-item');
+  const analysisTitle = document.getElementById('analysis-title');
+  const analysisTableWrapper = document.getElementById('analysis-table-wrapper');
+  const analysisMessage = document.getElementById('analysis-message');
+  const analysisChart = document.getElementById('analysisChart');
+
+  let proizvodRows = [];
+
+  const MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь',
+                     'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  const MONTH_INDEX = MONTHS_RU.reduce((acc, item, idx) => {
+    acc[item] = idx;
+    return acc;
+  }, {});
+
+  const analysisFilterState = {
+    fio: { label: 'Сотрудник', field: 'FIO', options: [], selected: new Set() },
+    year: { label: 'Год', field: 'Год', options: [], selected: new Set() },
+    month: { label: 'Месяц', field: 'Месяц', options: [], selected: new Set() },
+    work: { label: 'Работа', field: 'Work', options: [], selected: new Set() },
+    date: { label: 'Дата', field: 'Дата', options: [], selected: new Set() }
+  };
+
+  const analysisFilterDom = {
+    fio: {
+      button: document.getElementById('analysisFilterBtnFio'),
+      menu: document.getElementById('analysisFilterMenuFio'),
+      options: document.getElementById('analysisFilterOptionsFio'),
+      all: document.getElementById('analysisFilterAllFio'),
+      none: document.getElementById('analysisFilterNoneFio')
+    },
+    year: {
+      button: document.getElementById('analysisFilterBtnYear'),
+      menu: document.getElementById('analysisFilterMenuYear'),
+      options: document.getElementById('analysisFilterOptionsYear'),
+      all: document.getElementById('analysisFilterAllYear'),
+      none: document.getElementById('analysisFilterNoneYear')
+    },
+    month: {
+      button: document.getElementById('analysisFilterBtnMonth'),
+      menu: document.getElementById('analysisFilterMenuMonth'),
+      options: document.getElementById('analysisFilterOptionsMonth'),
+      all: document.getElementById('analysisFilterAllMonth'),
+      none: document.getElementById('analysisFilterNoneMonth')
+    },
+    work: {
+      button: document.getElementById('analysisFilterBtnWork'),
+      menu: document.getElementById('analysisFilterMenuWork'),
+      options: document.getElementById('analysisFilterOptionsWork'),
+      all: document.getElementById('analysisFilterAllWork'),
+      none: document.getElementById('analysisFilterNoneWork')
+    },
+    date: {
+      button: document.getElementById('analysisFilterBtnDate'),
+      menu: document.getElementById('analysisFilterMenuDate'),
+      options: document.getElementById('analysisFilterOptionsDate'),
+      all: document.getElementById('analysisFilterAllDate'),
+      none: document.getElementById('analysisFilterNoneDate')
+    }
+  };
+
+  function pad2(n) {
+    return String(n).padStart(2, '0');
+  }
+
+  // Парсинг даты формата DD.MM.YYYY HH:MM[:SS]
+  function parseRuDate(str) {
+    if (!str) return null;
+    const m = str.match(/^(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2})(?::(\d{2}))?/);
+    if (!m) return null;
+    const [, dd, mm, yyyy, hh, mn, ss] = m;
+    return new Date(+yyyy, +mm - 1, +dd, +hh, +mn, +(ss || 0));
+  }
+
+  function clearAnalysisView() {
+    analysisTableWrapper.innerHTML = '';
+  }
+
+  function clearAnalysisChart() {
+    analysisChart.innerHTML = '';
+    Object.keys(analysisFilterState).forEach(key => {
+      analysisFilterState[key].options = [];
+      analysisFilterState[key].selected = new Set();
+      renderAnalysisFilterOptions(key);
+      updateFilterButtonTitle(key);
+      analysisFilterDom[key].menu.classList.remove('open');
+    });
+    proizvodRows = [];
+  }
+
+  function setAnalysisMessage(text, isError = false) {
+    analysisMessage.textContent = text;
+    analysisMessage.classList.toggle('directory-message-error', isError);
+  }
+
+  function renderAnalysisTable(columns, rows) {
+    clearAnalysisView();
+    if (!rows.length) {
+      setAnalysisMessage('Файл не содержит данных.', true);
+      return;
+    }
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const tbody = document.createElement('tbody');
+
+    const headerRow = document.createElement('tr');
+    columns.forEach(col => {
+      const th = document.createElement('th');
+      th.textContent = col;
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+
+    rows.forEach(row => {
+      const tr = document.createElement('tr');
+      columns.forEach(col => {
+        const td = document.createElement('td');
+        td.textContent = row[col] ?? '';
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    analysisTableWrapper.appendChild(table);
+  }
+
+  function closeAllAnalysisFilterMenus() {
+    Object.keys(analysisFilterDom).forEach(key => {
+      analysisFilterDom[key].menu.classList.remove('open');
+    });
+  }
+
+  function sortFilterValues(key, values) {
+    if (key === 'year') {
+      return values.sort((a, b) => Number(a) - Number(b));
+    }
+
+    if (key === 'month') {
+      return values.sort((a, b) => (MONTH_INDEX[a] ?? 99) - (MONTH_INDEX[b] ?? 99));
+    }
+
+    if (key === 'date') {
+      return values.sort((a, b) => Number(a) - Number(b));
+    }
+
+    return values.sort((a, b) => a.localeCompare(b, 'ru'));
+  }
+
+  function updateFilterButtonTitle(key) {
+    const state = analysisFilterState[key];
+    const selectedCount = state.selected.size;
+    const totalCount = state.options.length;
+    analysisFilterDom[key].button.textContent = `${state.label}: ${selectedCount}/${totalCount}`;
+  }
+
+  function renderAnalysisFilterOptions(key) {
+    const state = analysisFilterState[key];
+    const optionsWrap = analysisFilterDom[key].options;
+    optionsWrap.innerHTML = '';
+
+    if (!state.options.length) {
+      const empty = document.createElement('div');
+      empty.className = 'analysis-filter-empty';
+      empty.textContent = 'Нет значений';
+      optionsWrap.appendChild(empty);
+      return;
+    }
+
+    state.options.forEach(value => {
+      const label = document.createElement('label');
+      label.className = 'analysis-filter-option';
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'analysis-filter-checkbox';
+      checkbox.dataset.filterKey = key;
+      checkbox.dataset.filterValue = value;
+      checkbox.checked = state.selected.has(value);
+
+      const text = document.createElement('span');
+      text.textContent = value;
+
+      label.appendChild(checkbox);
+      label.appendChild(text);
+      optionsWrap.appendChild(label);
+    });
+  }
+
+  function fillAnalysisFilters(rows) {
+    Object.keys(analysisFilterState).forEach(key => {
+      const field = analysisFilterState[key].field;
+      const values = Array.from(new Set(rows.map(r => (r[field] || '').trim()).filter(Boolean)));
+      analysisFilterState[key].options = sortFilterValues(key, values);
+      analysisFilterState[key].selected = new Set(analysisFilterState[key].options);
+      renderAnalysisFilterOptions(key);
+      updateFilterButtonTitle(key);
+    });
+  }
+
+  function setFilterSelection(key, mode) {
+    const state = analysisFilterState[key];
+    state.selected = mode === 'all' ? new Set(state.options) : new Set();
+    renderAnalysisFilterOptions(key);
+    updateFilterButtonTitle(key);
+    renderProizvodChart();
+  }
+
+  function buildHourlyChartPoints(rows) {
+    const fioSelected = analysisFilterState.fio.selected;
+    const yearSelected = analysisFilterState.year.selected;
+    const monthSelected = analysisFilterState.month.selected;
+    const workSelected = analysisFilterState.work.selected;
+    const dateSelected = analysisFilterState.date.selected;
+    const hourSums = Array.from({ length: 25 }, (_, hour) => ({ hour, sum: 0 }));
+
+    rows.forEach(row => {
+      const fio = (row['FIO'] || '').trim();
+      const year = (row['Год'] || '').trim();
+      const month = (row['Месяц'] || '').trim();
+      const work = (row['Work'] || '').trim();
+      const date = (row['Дата'] || '').trim();
+
+      if (!fioSelected.has(fio)) return;
+      if (!yearSelected.has(year)) return;
+      if (!monthSelected.has(month)) return;
+      if (!workSelected.has(work)) return;
+      if (!dateSelected.has(date)) return;
+
+      const valueNum = Number(String(row['Value'] || '').replace(',', '.'));
+      if (!Number.isFinite(valueNum)) return;
+
+      const rowHour = Number((row['Час'] || '').trim());
+      if (!Number.isFinite(rowHour) || rowHour < 0 || rowHour > 24) return;
+
+      hourSums[rowHour].sum += valueNum;
+    });
+
+    return hourSums;
+  }
+
+  function renderProizvodChart() {
+    analysisChart.innerHTML = '';
+
+    if (!proizvodRows.length) {
+      setAnalysisMessage('Нет данных для построения графика.', true);
+      return;
+    }
+
+    const points = buildHourlyChartPoints(proizvodRows);
+    if (!points.length) {
+      setAnalysisMessage('Нет данных для построения графика по выбранному фильтру.', true);
+      return;
+    }
+
+    const maxValue = Math.max(...points.map(p => p.sum), 1);
+
+    points.forEach(point => {
+      const item = document.createElement('div');
+      item.className = 'analysis-bar-item';
+
+      const value = document.createElement('div');
+      value.className = 'analysis-bar-value';
+      value.textContent = point.sum.toFixed(0);
+
+      const bar = document.createElement('div');
+      bar.className = 'analysis-bar';
+      const barHeightPx = Math.max(2, Math.round((point.sum / maxValue) * 180));
+      bar.style.height = `${barHeightPx}px`;
+      bar.title = `Час ${pad2(point.hour)} | ${point.sum.toFixed(2)}`;
+
+      const label = document.createElement('div');
+      label.className = 'analysis-bar-label';
+      label.innerHTML = `<span>${point.hour}</span>`;
+
+      item.appendChild(value);
+      item.appendChild(bar);
+      item.appendChild(label);
+      analysisChart.appendChild(item);
+    });
+
+    setAnalysisMessage('График построен по часам 0..24.', false);
+  }
+
+  async function loadProizvodData() {
+    clearAnalysisView();
+    setAnalysisMessage('Загрузка данных...', false);
+
+    if (!dbRouteSelect.value) {
+      setAnalysisMessage('Маршрут к БД не выбран. Выберите маршрут на вкладке «Настройки».', true);
+      return;
+    }
+    if (!currentDirHandle) {
+      setAnalysisMessage('Невозможно прочитать файл: маршрут к БД не поддерживает прямое чтение. Выберите папку заново через «Добавить маршрут БД».', true);
+      return;
+    }
+
+    let fileHandle;
+    try {
+      fileHandle = await currentDirHandle.getFileHandle('TEST ZAGRUZKA.csv');
+    } catch (e) {
+      setAnalysisMessage('Не удалось найти файл «TEST ZAGRUZKA.csv» в выбранной папке.', true);
+      return;
+    }
+
+    let text;
+    try {
+      const file = await fileHandle.getFile();
+      text = await file.text();
+    } catch (e) {
+      setAnalysisMessage('Ошибка чтения файла «TEST ZAGRUZKA.csv».', true);
+      return;
+    }
+
+    const parsed = parseSimpleCsv(text);
+
+    if (!parsed.columns.length) {
+      setAnalysisMessage('Файл «TEST ZAGRUZKA.csv» не содержит заголовка столбцов.', true);
+      return;
+    }
+
+    const requiredCols = ['DateTimeStart', 'login', 'FIO', 'Work', 'Value'];
+    const missingCols = requiredCols.filter(c => !parsed.columns.includes(c));
+    if (missingCols.length > 0) {
+      setAnalysisMessage(`В файле «TEST ZAGRUZKA.csv» отсутствуют столбцы: ${missingCols.join(', ')}.`, true);
+      return;
+    }
+
+    const outputCols = [...requiredCols, 'Год', 'Месяц', 'Дата', 'Час', 'Минута', 'Секунда'];
+
+    const outputRows = parsed.rows.slice(1).map(row => {
+      const dateStr = (row['DateTimeStart'] || '').trim();
+      const d = parseRuDate(dateStr);
+      const valid = d !== null;
+      const h = valid ? d.getHours() : null;
+
+      return {
+        'DateTimeStart': row['DateTimeStart'] || '',
+        'login':         row['login']         || '',
+        'FIO':           row['FIO']           || '',
+        'Work':          row['Work']          || '',
+        'Value':         row['Value']         || '',
+        'Год':     valid ? String(d.getFullYear())        : '',
+        'Месяц':   valid ? MONTHS_RU[d.getMonth()]        : '',
+        'Дата':    valid ? pad2(d.getDate())               : '',
+        'Час':     valid ? (h === 0 ? '24' : pad2(h))      : '',
+        'Минута':  valid ? pad2(d.getMinutes())            : '',
+        'Секунда': valid ? pad2(d.getSeconds())            : ''
+      };
+    });
+
+    renderAnalysisTable(outputCols, outputRows);
+    proizvodRows = outputRows;
+    fillAnalysisFilters(outputRows);
+    renderProizvodChart();
+    setAnalysisMessage(`Данные загружены из TEST ZAGRUZKA.csv. Строк: ${outputRows.length}.`, false);
+  }
+
+  Object.keys(analysisFilterDom).forEach(key => {
+    const dom = analysisFilterDom[key];
+
+    dom.button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const opened = dom.menu.classList.contains('open');
+      closeAllAnalysisFilterMenus();
+      if (!opened) {
+        dom.menu.classList.add('open');
+      }
+    });
+
+    dom.all.addEventListener('click', (event) => {
+      event.stopPropagation();
+      setFilterSelection(key, 'all');
+    });
+
+    dom.none.addEventListener('click', (event) => {
+      event.stopPropagation();
+      setFilterSelection(key, 'none');
+    });
+
+    dom.options.addEventListener('change', (event) => {
+      const target = event.target;
+      if (!target.classList.contains('analysis-filter-checkbox')) return;
+
+      const value = target.dataset.filterValue;
+      if (target.checked) {
+        analysisFilterState[key].selected.add(value);
+      } else {
+        analysisFilterState[key].selected.delete(value);
+      }
+
+      updateFilterButtonTitle(key);
+      renderProizvodChart();
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.analysis-filter-dropdown')) {
+      closeAllAnalysisFilterMenus();
+    }
+  });
+
+  analysisRadioItems.forEach(item => {
+    item.addEventListener('click', async () => {
+      analysisRadioItems.forEach(r => r.classList.remove('active'));
+      item.classList.add('active');
+
+      const sectionKey = item.dataset.analysisSection;
+      const nameMap = { downtime: 'Простои', proizvod: 'Производ', rating: 'Рейтинг', inout: 'Приход/Уход' };
+      analysisTitle.textContent = nameMap[sectionKey] || sectionKey;
+
+      if (sectionKey === 'proizvod') {
+        await loadProizvodData();
+      } else {
+        clearAnalysisView();
+        clearAnalysisChart();
+        setAnalysisMessage('Для выбранного раздела отображение ещё не реализовано.', false);
+      }
+    });
   });
 
   // Инициализация
