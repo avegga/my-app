@@ -380,6 +380,7 @@
       <div class="tab active" data-tab="upload">Загрузка фактов</div>
       <div class="tab" data-tab="directory">Справочник</div>
       <div class="tab" data-tab="analysis">Анализ</div>
+      <div class="tab" data-tab="instructions">Инструкции</div>
       <div class="tab" data-tab="settings">Настройки</div>
     </div>
   </div>
@@ -491,6 +492,11 @@
         <div class="settings-content"></div>
       </div>
 
+      <!-- ✅ ЗАКЛАДКА "ИНСТРУКЦИИ" -->
+      <div id="instructions-tab" class="tab-content">
+        <div class="settings-content"></div>
+      </div>
+
       <!-- ✅ ЗАКЛАДКА "НАСТРОЙКИ" -->
       <div id="settings-tab" class="tab-content">
         <div class="settings-content">
@@ -553,7 +559,7 @@
       return;
     }
 
-    if (tabId === 'analysis') {
+    if (tabId === 'analysis' || tabId === 'instructions') {
       sidebar.classList.add('hidden');
       analysisSidebar.classList.remove('hidden');
       mainContent.classList.remove('sidebar-hidden');
