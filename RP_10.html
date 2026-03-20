@@ -404,6 +404,48 @@
       height: 33px;
     }
 
+    .analysis-time-input {
+      width: 130px;
+      padding: 7px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #111827;
+      background: #ffffff;
+    }
+
+    .analysis-time-input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .analysis-lower-table-wrap {
+      flex: 1;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      background: #ffffff;
+      overflow: auto;
+      padding: 10px;
+      display: none;
+    }
+
+    .analysis-lower-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 10px;
+    }
+
+    .analysis-chart-wrap:fullscreen {
+      background: #ffffff;
+      padding: 16px;
+    }
+
+    .analysis-chart-wrap:fullscreen .analysis-chart {
+      min-height: calc(100vh - 80px);
+    }
+
     .analysis-filter-group .settings-label {
       margin-bottom: 0;
       font-size: 13px;
@@ -689,7 +731,7 @@
 
           <div id="analysisBottomPanel" class="panel" style="flex-basis: 45%;">
             <div class="panel-header">
-              <div>График производительности</div>
+              <div id="analysisBottomTitle">График производительности</div>
             </div>
             <div class="panel-body">
               <div class="analysis-bottom-content">
@@ -772,13 +814,39 @@
                       </div>
                     </div>
                   </div>
+                  <div id="analysisTimeFromGroup" class="analysis-filter-group" style="display: none;">
+                    <div class="settings-label">Часы с</div>
+                    <input id="analysisTimeFrom" class="analysis-time-input" type="text" inputmode="numeric" placeholder="ЧЧ:ММ:СС" />
+                  </div>
+                  <div id="analysisTimeToGroup" class="analysis-filter-group" style="display: none;">
+                    <div class="settings-label">Часы по</div>
+                    <input id="analysisTimeTo" class="analysis-time-input" type="text" inputmode="numeric" placeholder="ЧЧ:ММ:СС" />
+                  </div>
                   <div class="analysis-filter-group analysis-action-group">
                     <button id="analysisDisplayBtn" class="btn btn-primary analysis-display-btn" type="button" style="display: none;">Отобразить</button>
                   </div>
+                  <div class="analysis-filter-group analysis-action-group">
+                    <button id="analysisFullscreenBtn" class="btn analysis-display-btn" type="button" style="display: none;">На весь экран</button>
+                  </div>
                 </div>
                 <div id="analysis-message" class="directory-message" style="padding: 0; text-align: left; margin-top: 0;">Выберите раздел анализа в боковом меню.</div>
-                <div class="analysis-chart-wrap">
+                <div id="analysisChartWrap" class="analysis-chart-wrap">
                   <div id="analysisChart" class="analysis-chart"></div>
+                </div>
+                <div id="analysisLowerTableWrap" class="analysis-lower-table-wrap">
+                  <div class="analysis-lower-title">Итоговая таблица простоев</div>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th style="width: 48px;">№</th>
+                        <th>FIO</th>
+                        <th>Время с</th>
+                        <th>Время по</th>
+                        <th>Время смены</th>
+                      </tr>
+                    </thead>
+                    <tbody id="analysisLowerTableBody"></tbody>
+                  </table>
                 </div>
               </div>
             </div>
@@ -1482,15 +1550,25 @@
   // ========== АНАЛИЗ ==========
   const analysisRadioItems = document.querySelectorAll('.analysis-radio-item');
   const analysisTitle = document.getElementById('analysis-title');
+  const analysisBottomTitle = document.getElementById('analysisBottomTitle');
   const analysisTableWrapper = document.getElementById('analysis-table-wrapper');
   const analysisMessage = document.getElementById('analysis-message');
+  const analysisChartWrap = document.getElementById('analysisChartWrap');
   const analysisChart = document.getElementById('analysisChart');
+  const analysisLowerTableWrap = document.getElementById('analysisLowerTableWrap');
+  const analysisLowerTableBody = document.getElementById('analysisLowerTableBody');
+  const analysisTimeFromGroup = document.getElementById('analysisTimeFromGroup');
+  const analysisTimeToGroup = document.getElementById('analysisTimeToGroup');
+  const analysisTimeFrom = document.getElementById('analysisTimeFrom');
+  const analysisTimeTo = document.getElementById('analysisTimeTo');
   const analysisDisplayBtn = document.getElementById('analysisDisplayBtn');
+  const analysisFullscreenBtn = document.getElementById('analysisFullscreenBtn');
 
   let proizvodRows = [];
   let proizvodColumns = [];
   let currentAnalysisMode = 'hour'; // 'hour' | 'minute'
   let minuteDisplayActivated = false;
+  let downtimeDisplayActivated = false;
 
   const MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь',
                      'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
@@ -1572,6 +1650,9 @@
 
   function clearAnalysisChart() {
     analysisChart.innerHTML = '';
+    analysisLowerTableBody.innerHTML = '';
+    analysisLowerTableWrap.style.display = 'none';
+    analysisChartWrap.style.display = 'block';
     Object.keys(analysisFilterState).forEach(key => {
       analysisFilterState[key].options = [];
       analysisFilterState[key].selected = new Set();
@@ -1582,12 +1663,43 @@
     proizvodRows = [];
     proizvodColumns = [];
     minuteDisplayActivated = false;
+    downtimeDisplayActivated = false;
     analysisDisplayBtn.style.display = 'none';
+    analysisFullscreenBtn.style.display = 'none';
+    analysisTimeFromGroup.style.display = 'none';
+    analysisTimeToGroup.style.display = 'none';
+    analysisTimeFrom.value = '';
+    analysisTimeTo.value = '';
+    analysisBottomTitle.textContent = 'График производительности';
+  }
+
+  function updateAnalysisFullscreenButton() {
+    const isFullscreen = document.fullscreenElement === analysisChartWrap;
+    analysisFullscreenBtn.textContent = isFullscreen ? 'Свернуть' : 'На весь экран';
   }
 
   function setAnalysisMessage(text, isError = false) {
     analysisMessage.textContent = text;
     analysisMessage.classList.toggle('directory-message-error', isError);
+  }
+
+  function toggleAnalysisLowerContent(mode) {
+    const showDowntimeTable = mode === 'downtime';
+    analysisChartWrap.style.display = showDowntimeTable ? 'none' : 'block';
+    analysisLowerTableWrap.style.display = showDowntimeTable ? 'block' : 'none';
+  }
+
+  function updateAnalysisModeControls() {
+    const isMinute = currentAnalysisMode === 'minute';
+    const isDowntime = currentAnalysisMode === 'downtime';
+
+    analysisTimeFromGroup.style.display = isDowntime ? 'flex' : 'none';
+    analysisTimeToGroup.style.display = isDowntime ? 'flex' : 'none';
+    analysisDisplayBtn.style.display = (isMinute || isDowntime) ? 'inline-flex' : 'none';
+    analysisFullscreenBtn.style.display = isMinute ? 'inline-flex' : 'none';
+    analysisBottomTitle.textContent = isDowntime ? 'Таблица простоев' : 'График производительности';
+    toggleAnalysisLowerContent(isDowntime ? 'downtime' : 'chart');
+    updateAnalysisFullscreenButton();
   }
 
   function renderAnalysisTable(columns, rows) {
@@ -1621,6 +1733,31 @@
     table.appendChild(thead);
     table.appendChild(tbody);
     analysisTableWrapper.appendChild(table);
+  }
+
+  function renderDowntimeTable(rows, timeFrom, timeTo, shiftTime) {
+    analysisLowerTableBody.innerHTML = '';
+
+    const uniqueFio = Array.from(new Set(rows.map(row => (row['FIO'] || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ru'));
+
+    uniqueFio.forEach((fio, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${fio}</td>
+        <td>${timeFrom}</td>
+        <td>${timeTo}</td>
+        <td>${shiftTime}</td>
+      `;
+      analysisLowerTableBody.appendChild(tr);
+    });
+
+    if (!uniqueFio.length) {
+      setAnalysisMessage('Нет данных для построения таблицы простоев по выбранным фильтрам.', true);
+      return;
+    }
+
+    setAnalysisMessage(`Данные простоев отображены. Сотрудников: ${uniqueFio.length}.`, false);
   }
 
   function closeAllAnalysisFilterMenus() {
@@ -1726,15 +1863,128 @@
     }
   }
 
+  function getFilteredAnalysisRows(rows) {
+    const fioSelected = analysisFilterState.fio.selected;
+    const yearSelected = analysisFilterState.year.selected;
+    const monthSelected = analysisFilterState.month.selected;
+    const workSelected = analysisFilterState.work.selected;
+    const hourSelected = analysisFilterState.hour.selected;
+    const dateSelected = analysisFilterState.date.selected;
+
+    return rows.filter(row => {
+      const fio = (row['FIO'] || '').trim();
+      const year = (row['Год'] || '').trim();
+      const month = (row['Месяц'] || '').trim();
+      const work = (row['Work'] || '').trim();
+      const hour = (row['Час'] || '').trim();
+      const date = (row['Дата'] || '').trim();
+
+      return fioSelected.has(fio)
+        && yearSelected.has(year)
+        && monthSelected.has(month)
+        && workSelected.has(work)
+        && hourSelected.has(hour)
+        && dateSelected.has(date);
+    });
+  }
+
+  function parseAnalysisTimeValue(value) {
+    const normalized = String(value || '').trim();
+    const match = normalized.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
+    if (!match) {
+      return null;
+    }
+
+    const hours = Number(match[1]);
+    const minutes = Number(match[2]);
+    const seconds = Number(match[3]);
+
+    if (!Number.isInteger(hours) || hours < 0 || hours > 24) return null;
+    if (!Number.isInteger(minutes) || minutes < 0 || minutes > 59) return null;
+    if (!Number.isInteger(seconds) || seconds < 0 || seconds > 59) return null;
+
+    return {
+      formatted: `${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`,
+      totalSeconds: hours * 3600 + minutes * 60 + seconds
+    };
+  }
+
+  function formatDurationFromSeconds(totalSeconds) {
+    const safeSeconds = Math.max(0, totalSeconds);
+    const hours = Math.floor(safeSeconds / 3600);
+    const minutes = Math.floor((safeSeconds % 3600) / 60);
+    const seconds = safeSeconds % 60;
+    return `${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`;
+  }
+
+  function validateDowntimeTimeRange() {
+    const from = parseAnalysisTimeValue(analysisTimeFrom.value);
+    if (!from) {
+      setAnalysisMessage('Поле «Часы с» должно быть в формате ЧЧ:ММ:СС.', true);
+      return null;
+    }
+
+    const to = parseAnalysisTimeValue(analysisTimeTo.value);
+    if (!to) {
+      setAnalysisMessage('Поле «Часы по» должно быть в формате ЧЧ:ММ:СС.', true);
+      return null;
+    }
+
+    if (to.totalSeconds < from.totalSeconds) {
+      setAnalysisMessage('Значение «Часы по» должно быть больше либо равно «Часы с».', true);
+      return null;
+    }
+
+    return {
+      timeFrom: from.formatted,
+      timeTo: to.formatted,
+      shiftTime: formatDurationFromSeconds(to.totalSeconds - from.totalSeconds)
+    };
+  }
+
+  function renderDowntimeView() {
+    const timeRange = validateDowntimeTimeRange();
+    if (!timeRange) {
+      clearAnalysisView();
+      analysisLowerTableBody.innerHTML = '';
+      return;
+    }
+
+    const filteredRows = getFilteredAnalysisRows(proizvodRows);
+    if (!filteredRows.length) {
+      clearAnalysisView();
+      analysisLowerTableBody.innerHTML = '';
+      setAnalysisMessage('Нет данных для отображения простоев по выбранным фильтрам.', true);
+      return;
+    }
+
+    renderAnalysisTable(proizvodColumns, filteredRows);
+    renderDowntimeTable(filteredRows, timeRange.timeFrom, timeRange.timeTo, timeRange.shiftTime);
+  }
+
   function setFilterSelection(key, mode) {
     const state = analysisFilterState[key];
     state.selected = mode === 'all' ? new Set(state.options) : new Set();
     renderAnalysisFilterOptions(key);
     updateFilterButtonTitle(key);
+    if (currentAnalysisMode === 'minute' && !minuteDisplayActivated) {
+      return;
+    }
+    if (currentAnalysisMode === 'downtime' && downtimeDisplayActivated) {
+      renderDowntimeView();
+      return;
+    }
+    if (currentAnalysisMode === 'downtime' && !downtimeDisplayActivated) {
+      return;
+    }
     renderCurrentChart();
   }
 
   function renderCurrentChart() {
+    if (currentAnalysisMode === 'downtime') {
+      renderDowntimeView();
+      return;
+    }
     if (currentAnalysisMode === 'minute') {
       renderProizvodMinChart();
     } else {
@@ -1743,28 +1993,9 @@
   }
 
   function buildHourlyChartPoints(rows) {
-    const fioSelected = analysisFilterState.fio.selected;
-    const yearSelected = analysisFilterState.year.selected;
-    const monthSelected = analysisFilterState.month.selected;
-    const workSelected = analysisFilterState.work.selected;
-    const hourSelected = analysisFilterState.hour.selected;
-    const dateSelected = analysisFilterState.date.selected;
     const hourSums = Array.from({ length: 25 }, (_, hour) => ({ hour, sum: 0 }));
 
-    rows.forEach(row => {
-      const fio = (row['FIO'] || '').trim();
-      const year = (row['Год'] || '').trim();
-      const month = (row['Месяц'] || '').trim();
-      const work = (row['Work'] || '').trim();
-      const hour = (row['Час'] || '').trim();
-      const date = (row['Дата'] || '').trim();
-
-      if (!fioSelected.has(fio)) return;
-      if (!yearSelected.has(year)) return;
-      if (!monthSelected.has(month)) return;
-      if (!workSelected.has(work)) return;
-      if (!hourSelected.has(hour)) return;
-      if (!dateSelected.has(date)) return;
+    getFilteredAnalysisRows(rows).forEach(row => {
 
       const valueNum = Number(String(row['Value'] || '').replace(',', '.'));
       if (!Number.isFinite(valueNum)) return;
@@ -1822,28 +2053,8 @@
   }
 
   function buildMinuteChartPoints(rows) {
-    const fioSelected = analysisFilterState.fio.selected;
-    const yearSelected = analysisFilterState.year.selected;
-    const monthSelected = analysisFilterState.month.selected;
-    const workSelected = analysisFilterState.work.selected;
     const hourSelected = analysisFilterState.hour.selected;
-    const dateSelected = analysisFilterState.date.selected;
-
-    const filteredRows = rows.filter(row => {
-      const fio = (row['FIO'] || '').trim();
-      const year = (row['Год'] || '').trim();
-      const month = (row['Месяц'] || '').trim();
-      const work = (row['Work'] || '').trim();
-      const hour = (row['Час'] || '').trim();
-      const date = (row['Дата'] || '').trim();
-
-      return fioSelected.has(fio)
-        && yearSelected.has(year)
-        && monthSelected.has(month)
-        && workSelected.has(work)
-        && hourSelected.has(hour)
-        && dateSelected.has(date);
-    });
+    const filteredRows = getFilteredAnalysisRows(rows);
 
     if (!filteredRows.length) {
       return [];
@@ -2024,17 +2235,26 @@
     proizvodRows = outputRows;
     fillAnalysisFilters(outputRows);
 
+    if (currentAnalysisMode === 'downtime') {
+      clearAnalysisView();
+      analysisLowerTableBody.innerHTML = '';
+      downtimeDisplayActivated = false;
+      updateAnalysisModeControls();
+      setAnalysisMessage('Для режима «Простои» задайте интервал времени и нажмите «Отобразить».', false);
+      return;
+    }
+
     if (currentAnalysisMode === 'minute') {
       applyMinuteModeDefaults(outputRows);
       clearAnalysisView();
       analysisChart.innerHTML = '';
       minuteDisplayActivated = false;
-      analysisDisplayBtn.style.display = 'inline-flex';
+      updateAnalysisModeControls();
       setAnalysisMessage('Для режима «Производ (мин)» выберите фильтры и нажмите «Отобразить».', false);
       return;
     }
 
-    analysisDisplayBtn.style.display = 'none';
+    updateAnalysisModeControls();
     renderAnalysisTable(outputCols, outputRows);
     renderCurrentChart();
     setAnalysisMessage(`Данные загружены из TEST ZAGRUZKA.csv. Строк: ${outputRows.length}.`, false);
@@ -2074,6 +2294,10 @@
       }
 
       updateFilterButtonTitle(key);
+      if (currentAnalysisMode === 'downtime' && downtimeDisplayActivated) {
+        renderDowntimeView();
+        return;
+      }
       if (!(currentAnalysisMode === 'minute' && !minuteDisplayActivated)) {
         renderCurrentChart();
       }
@@ -2081,10 +2305,36 @@
   });
 
   analysisDisplayBtn.addEventListener('click', () => {
+    if (currentAnalysisMode === 'minute') {
+      minuteDisplayActivated = true;
+      renderAnalysisTable(proizvodColumns, proizvodRows);
+      renderCurrentChart();
+      return;
+    }
+
+    if (currentAnalysisMode === 'downtime') {
+      downtimeDisplayActivated = true;
+      renderDowntimeView();
+    }
+  });
+
+  analysisFullscreenBtn.addEventListener('click', async () => {
     if (currentAnalysisMode !== 'minute') return;
-    minuteDisplayActivated = true;
-    renderAnalysisTable(proizvodColumns, proizvodRows);
-    renderCurrentChart();
+
+    try {
+      if (document.fullscreenElement === analysisChartWrap) {
+        await document.exitFullscreen();
+      } else {
+        await analysisChartWrap.requestFullscreen();
+      }
+      updateAnalysisFullscreenButton();
+    } catch (error) {
+      setAnalysisMessage('Не удалось переключить полноэкранный режим диаграммы.', true);
+    }
+  });
+
+  document.addEventListener('fullscreenchange', () => {
+    updateAnalysisFullscreenButton();
   });
 
   document.addEventListener('click', (event) => {
@@ -2102,9 +2352,11 @@
       const nameMap = { downtime: 'Простои', proizvod: 'Производ', proizvod_min: 'Производ (мин)', rating: 'Рейтинг', inout: 'Приход/Уход' };
       analysisTitle.textContent = nameMap[sectionKey] || sectionKey;
 
-      if (sectionKey === 'proizvod' || sectionKey === 'proizvod_min') {
-        currentAnalysisMode = sectionKey === 'proizvod_min' ? 'minute' : 'hour';
-        minuteDisplayActivated = currentAnalysisMode !== 'minute';
+      if (sectionKey === 'proizvod' || sectionKey === 'proizvod_min' || sectionKey === 'downtime') {
+        currentAnalysisMode = sectionKey === 'proizvod_min' ? 'minute' : sectionKey === 'downtime' ? 'downtime' : 'hour';
+        minuteDisplayActivated = false;
+        downtimeDisplayActivated = false;
+        updateAnalysisModeControls();
         await loadProizvodData();
       } else {
         clearAnalysisView();
