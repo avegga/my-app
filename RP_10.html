@@ -188,6 +188,30 @@
       color: #dc2626;
     }
 
+    .directory-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+      gap: 8px;
+    }
+
+    .directory-input {
+      width: 100%;
+      min-width: 90px;
+      padding: 6px 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #111827;
+      background: #ffffff;
+    }
+
+    .directory-input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+    }
+
     /* ✅ ИНТЕРФЕЙС ЗАГРУЗКИ ФАКТОВ */
     .upload-content {
       flex: 1;
@@ -631,6 +655,10 @@
           <input type="radio" name="directory" value="schedules">
           <span class="radio-label">Графики работы</span>
         </label>
+        <label class="radio-item directory-radio-item" data-section="downtime-standards">
+          <input type="radio" name="directory" value="downtime-standards">
+          <span class="radio-label">Нормы простоя</span>
+        </label>
       </div>
     </div>
 
@@ -708,6 +736,9 @@
       <div id="directory-tab" class="tab-content">
         <div class="directory-content">
           <div id="directory-title" class="directory-title">Персонал</div>
+          <div class="directory-toolbar">
+            <button id="directorySaveBtn" class="btn" type="button" style="display: none;">Сохранить изменения</button>
+          </div>
           <div id="directory-table-wrapper" class="directory-table-wrapper"></div>
           <div id="directory-message" class="directory-message">
             Выберите справочник и маршрут к БД, чтобы отобразить данные.
@@ -843,6 +874,9 @@
                         <th>Время с</th>
                         <th>Время по</th>
                         <th>Время смены</th>
+                        <th>Сумма простоев с.</th>
+                        <th>Время выполнения</th>
+                        <th>Расчетный простой</th>
                       </tr>
                     </thead>
                     <tbody id="analysisLowerTableBody"></tbody>
@@ -904,6 +938,13 @@
   // Для справочника
   let directoryPersonnelData = [];
   let directoryPersonnelColumns = [];
+  let currentDirectorySection = 'personnel';
+  let directoryEditableRows = [];
+  let directoryEditableColumns = [];
+  let directoryEditableFilename = '';
+  let directoryHasUnsavedChanges = false;
+  let downtimeNormsMap = new Map();
+  let normaDlitMap = new Map();
 
   // ========== ✅ УПРАВЛЕНИЕ ЗАКЛАДКАМИ ==========
   const tabs = document.querySelectorAll('.tab');
@@ -952,9 +993,21 @@
   const directoryTitle = document.getElementById('directory-title');
   const directoryTableWrapper = document.getElementById('directory-table-wrapper');
   const directoryMessage = document.getElementById('directory-message');
+  const directorySaveBtn = document.getElementById('directorySaveBtn');
 
   function clearDirectoryView() {
     directoryTableWrapper.innerHTML = '';
+  }
+
+  function updateDirectorySaveButton() {
+    if (currentDirectorySection === 'downtime-standards') {
+      directorySaveBtn.style.display = 'inline-flex';
+      directorySaveBtn.disabled = !directoryEditableRows.length || !directoryHasUnsavedChanges;
+      return;
+    }
+
+    directorySaveBtn.style.display = 'none';
+    directorySaveBtn.disabled = true;
   }
 
   function setDirectoryMessage(text, isError = false) {
@@ -983,6 +1036,11 @@
 
   function renderDirectoryTable(columns, dataRows, emptyMessage, successMessage) {
     clearDirectoryView();
+    directoryEditableRows = [];
+    directoryEditableColumns = [];
+    directoryEditableFilename = '';
+    directoryHasUnsavedChanges = false;
+    updateDirectorySaveButton();
 
     if (!columns.length || !dataRows.length) {
       setDirectoryMessage(emptyMessage, true);
@@ -1017,6 +1075,57 @@
     setDirectoryMessage(successMessage, false);
   }
 
+  function renderEditableDirectoryTable(columns, dataRows, successMessage, filename) {
+    clearDirectoryView();
+    directoryEditableColumns = [...columns];
+    directoryEditableRows = dataRows.map(row => ({ ...row }));
+    directoryEditableFilename = filename;
+    directoryHasUnsavedChanges = false;
+
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const tbody = document.createElement('tbody');
+
+    const headerRow = document.createElement('tr');
+    columns.forEach(col => {
+      const th = document.createElement('th');
+      th.textContent = col;
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+
+    directoryEditableRows.forEach((row, rowIndex) => {
+      const tr = document.createElement('tr');
+      columns.forEach(col => {
+        const td = document.createElement('td');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'directory-input';
+        input.value = row[col] ?? '';
+        input.dataset.rowIndex = String(rowIndex);
+        input.dataset.columnName = col;
+        input.addEventListener('input', (event) => {
+          const target = event.target;
+          const dataRowIndex = Number(target.dataset.rowIndex);
+          const columnName = target.dataset.columnName;
+          directoryEditableRows[dataRowIndex][columnName] = target.value;
+          directoryHasUnsavedChanges = true;
+          updateDirectorySaveButton();
+          setDirectoryMessage(`Изменения в ${directoryEditableFilename} не сохранены.`, false);
+        });
+        td.appendChild(input);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    directoryTableWrapper.appendChild(table);
+    updateDirectorySaveButton();
+    setDirectoryMessage(successMessage, false);
+  }
+
   async function loadDirectoryCsvByCandidates(candidates) {
     if (!currentDirHandle) {
       return null;
@@ -1037,6 +1146,11 @@
 
   async function loadDirectorySectionFromCurrentDbRoute(fileCandidates, emptyDataMessage) {
     clearDirectoryView();
+    directoryEditableRows = [];
+    directoryEditableColumns = [];
+    directoryEditableFilename = '';
+    directoryHasUnsavedChanges = false;
+    updateDirectorySaveButton();
 
     if (!dbRouteSelect.value) {
       setDirectoryMessage('Маршрут к БД не выбран. Выберите маршрут на вкладке «Настройки».', true);
@@ -1080,15 +1194,207 @@
     }
   }
 
+  async function loadEditableDirectorySectionFromCurrentDbRoute(fileCandidates, emptyDataMessage) {
+    clearDirectoryView();
+    directoryEditableRows = [];
+    directoryEditableColumns = [];
+    directoryEditableFilename = '';
+    directoryHasUnsavedChanges = false;
+    updateDirectorySaveButton();
+
+    if (!dbRouteSelect.value) {
+      setDirectoryMessage('Маршрут к БД не выбран. Выберите маршрут на вкладке «Настройки».', true);
+      return;
+    }
+
+    if (!currentDirHandle) {
+      setDirectoryMessage('Невозможно прочитать norma_prostoy.csv: текущий маршрут к БД не поддерживает прямое чтение файлов. Выберите папку заново через «Добавить маршрут БД».', true);
+      return;
+    }
+
+    try {
+      const fileWithName = await loadDirectoryCsvByCandidates(fileCandidates);
+      if (!fileWithName) {
+        setDirectoryMessage(`Не удалось найти файл ${fileCandidates.join(' или ')} в выбранной папке.`, true);
+        return;
+      }
+
+      const text = await fileWithName.file.text();
+      const parsed = parseSimpleCsv(text);
+
+      if (!parsed.columns.length) {
+        setDirectoryMessage(`${fileWithName.filename} не содержит заголовка столбцов.`, true);
+        return;
+      }
+
+      if (!parsed.rows.length) {
+        setDirectoryMessage(emptyDataMessage, true);
+        return;
+      }
+
+      renderEditableDirectoryTable(
+        parsed.columns,
+        parsed.rows,
+        `Данные загружены из ${fileWithName.filename}. Можно редактировать и сохранять изменения.`,
+        fileWithName.filename
+      );
+    } catch (e) {
+      console.error('Ошибка чтения редактируемого справочника:', e);
+      setDirectoryMessage(`Не удалось прочитать файл ${fileCandidates.join(' или ')} в выбранной папке. Проверьте его наличие и права доступа.`, true);
+    }
+  }
+
+  function generateDirectoryCsv(columns, rows) {
+    const lines = [columns.join(';')];
+    rows.forEach(row => {
+      lines.push(columns.map(col => String(row[col] ?? '').trim()).join(';'));
+    });
+    return lines.join('\n');
+  }
+
+  function refreshDowntimeNormsMap() {
+    const map = new Map();
+    directoryEditableRows.forEach(row => {
+      const id = String(row.id ?? row.ID ?? '').trim();
+      const valueRaw = String(row.value ?? row.VALUE ?? '').trim().replace(',', '.');
+      const value = Number(valueRaw);
+      if (!id) return;
+      if (!Number.isFinite(value)) return;
+      map.set(id, value);
+    });
+    downtimeNormsMap = map;
+  }
+
+  async function ensureDowntimeNormsLoaded() {
+    if (!dbRouteSelect.value || !currentDirHandle) {
+      return;
+    }
+
+    if (currentDirectorySection === 'downtime-standards' && directoryEditableRows.length) {
+      refreshDowntimeNormsMap();
+      return;
+    }
+
+    try {
+      const fileWithName = await loadDirectoryCsvByCandidates(['norma_prostoy.csv', 'norma_prostoy']);
+      if (!fileWithName) {
+        downtimeNormsMap = new Map();
+        return;
+      }
+
+      const text = await fileWithName.file.text();
+      const parsed = parseSimpleCsv(text);
+      const map = new Map();
+
+      parsed.rows.forEach(row => {
+        const id = String(row.id ?? row.ID ?? '').trim();
+        const valueRaw = String(row.value ?? row.VALUE ?? '').trim().replace(',', '.');
+        const value = Number(valueRaw);
+        if (!id) return;
+        if (!Number.isFinite(value)) return;
+        map.set(id, value);
+      });
+
+      downtimeNormsMap = map;
+    } catch (error) {
+      console.error('Ошибка загрузки норм простоя:', error);
+      downtimeNormsMap = new Map();
+    }
+  }
+
+  async function ensureNormaDlitLoaded() {
+    if (!dbRouteSelect.value || !currentDirHandle) {
+      return;
+    }
+
+    if (currentDirectorySection === 'standards' && directoryEditableRows.length) {
+      const map = new Map();
+      directoryEditableRows.forEach(row => {
+        const id = String(row.id ?? row.ID ?? '').trim();
+        const dlitRaw = String(row.dlit ?? row.DLIT ?? '').trim().replace(',', '.');
+        const dlit = Number(dlitRaw);
+        if (!id) return;
+        if (!Number.isFinite(dlit)) return;
+        map.set(id, dlit);
+      });
+      normaDlitMap = map;
+      return;
+    }
+
+    try {
+      const fileWithName = await loadDirectoryCsvByCandidates(['norma.csv', 'norma']);
+      if (!fileWithName) {
+        normaDlitMap = new Map();
+        return;
+      }
+
+      const text = await fileWithName.file.text();
+      const parsed = parseSimpleCsv(text);
+      const map = new Map();
+
+      parsed.rows.forEach(row => {
+        const id = String(row.id ?? row.ID ?? '').trim();
+        const dlitRaw = String(row.dlit ?? row.DLIT ?? '').trim().replace(',', '.');
+        const dlit = Number(dlitRaw);
+        if (!id) return;
+        if (!Number.isFinite(dlit)) return;
+        map.set(id, dlit);
+      });
+
+      normaDlitMap = map;
+    } catch (error) {
+      console.error('Ошибка загрузки нормативов (dlit):', error);
+      normaDlitMap = new Map();
+    }
+  }
+
+  async function saveEditableDirectorySection() {
+    if (currentDirectorySection !== 'downtime-standards') {
+      return;
+    }
+
+    if (!dbRouteSelect.value) {
+      setDirectoryMessage('Маршрут к БД не выбран. Выберите маршрут на вкладке «Настройки».', true);
+      return;
+    }
+
+    if (!currentDirHandle) {
+      setDirectoryMessage('Невозможно сохранить файл: маршрут к БД не поддерживает прямую запись. Выберите папку заново через «Добавить маршрут БД».', true);
+      return;
+    }
+
+    if (!directoryEditableColumns.length || !directoryEditableRows.length || !directoryEditableFilename) {
+      setDirectoryMessage('Нет данных для сохранения.', true);
+      return;
+    }
+
+    try {
+      const fileHandle = await currentDirHandle.getFileHandle(directoryEditableFilename, { create: true });
+      const writable = await fileHandle.createWritable();
+      await writable.write(generateDirectoryCsv(directoryEditableColumns, directoryEditableRows));
+      await writable.close();
+
+      refreshDowntimeNormsMap();
+      directoryHasUnsavedChanges = false;
+      updateDirectorySaveButton();
+      setDirectoryMessage(`Изменения сохранены в ${directoryEditableFilename}.`, false);
+    } catch (error) {
+      console.error('Ошибка сохранения справочника:', error);
+      setDirectoryMessage('Не удалось сохранить изменения в norma_prostoy.csv. Проверьте права доступа к папке.', true);
+    }
+  }
+
   radioItems.forEach(item => {
     item.addEventListener('click', async () => {
       radioItems.forEach(r => r.classList.remove('active'));
       item.classList.add('active');
 
       const sectionKey = item.dataset.section;
+      currentDirectorySection = sectionKey;
       const sectionName = sectionKey === 'personnel' ? 'Персонал' :
                          sectionKey === 'operations' ? 'Операции' :
                          sectionKey === 'standards' ? 'Нормативы' :
+                         sectionKey === 'downtime-standards' ? 'Нормы простоя' :
                          sectionKey === 'shifts' ? 'Смены' :
                          'Графики работы';
 
@@ -1109,12 +1415,24 @@
           ['norma.csv', 'norma'],
           'Файл norma.csv пустой или не содержит данных.'
         );
+      } else if (sectionKey === 'downtime-standards') {
+        await loadEditableDirectorySectionFromCurrentDbRoute(
+          ['norma_prostoy.csv', 'norma_prostoy'],
+          'Файл norma_prostoy.csv пустой или не содержит данных.'
+        );
       } else {
         clearDirectoryView();
+        directoryEditableRows = [];
+        directoryEditableColumns = [];
+        directoryEditableFilename = '';
+        directoryHasUnsavedChanges = false;
+        updateDirectorySaveButton();
         setDirectoryMessage('Для выбранного справочника отображение ещё не реализовано.', false);
       }
     });
   });
+
+  directorySaveBtn.addEventListener('click', saveEditableDirectorySection);
 
   // ========== ЛОГИКА НАСТРОЕК ==========
   const dbRouteSelect = document.getElementById('dbRouteSelect');
@@ -1735,12 +2053,54 @@
     analysisTableWrapper.appendChild(table);
   }
 
-  function renderDowntimeTable(rows, timeFrom, timeTo, shiftTime) {
+  function calculateDowntimeEmployeeSum(rowsByEmployee) {
+    let sum = 0;
+
+    rowsByEmployee.forEach(row => {
+      const idWork = String(row.idWork ?? '').trim();
+      if (!idWork) return;
+
+      const normaValue = downtimeNormsMap.get(idWork);
+      if (!Number.isFinite(normaValue)) return;
+
+      const valueRaw = String(row.Value ?? '').trim().replace(',', '.');
+      const rowValue = Number(valueRaw);
+      if (!Number.isFinite(rowValue)) return;
+
+      sum += normaValue * rowValue;
+    });
+
+    return sum;
+  }
+
+  function calculateDowntimeEmployeeExecTime(rowsByEmployee) {
+    let seconds = 0;
+    rowsByEmployee.forEach(row => {
+      const idWork = String(row.idWork ?? '').trim();
+      if (!idWork) return;
+      const dlitValue = normaDlitMap.get(idWork);
+      if (!Number.isFinite(dlitValue)) return;
+      const valueRaw = String(row.Value ?? '').trim().replace(',', '.');
+      const rowValue = Number(valueRaw);
+      if (!Number.isFinite(rowValue)) return;
+      seconds += dlitValue * rowValue;
+    });
+    return seconds;
+  }
+
+  function renderDowntimeTable(rows, timeFrom, timeTo, shiftTime, shiftSeconds) {
     analysisLowerTableBody.innerHTML = '';
 
     const uniqueFio = Array.from(new Set(rows.map(row => (row['FIO'] || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ru'));
 
     uniqueFio.forEach((fio, index) => {
+      const employeeRows = rows.filter(row => (row['FIO'] || '').trim() === fio);
+      const downtimeSum = calculateDowntimeEmployeeSum(employeeRows);
+      const execTimeSeconds = calculateDowntimeEmployeeExecTime(employeeRows);
+      const execTimeFormatted = formatDurationFromSeconds(execTimeSeconds);
+      const calcedDowntimeSeconds = Math.max(0, shiftSeconds - execTimeSeconds);
+      const calcedDowntimeFormatted = formatDurationFromSeconds(calcedDowntimeSeconds);
+
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${index + 1}</td>
@@ -1748,6 +2108,9 @@
         <td>${timeFrom}</td>
         <td>${timeTo}</td>
         <td>${shiftTime}</td>
+        <td>${downtimeSum.toFixed(2)}</td>
+        <td>${execTimeFormatted}</td>
+        <td>${calcedDowntimeFormatted}</td>
       `;
       analysisLowerTableBody.appendChild(tr);
     });
@@ -1938,17 +2301,21 @@
     return {
       timeFrom: from.formatted,
       timeTo: to.formatted,
-      shiftTime: formatDurationFromSeconds(to.totalSeconds - from.totalSeconds)
+      shiftTime: formatDurationFromSeconds(to.totalSeconds - from.totalSeconds),
+      shiftSeconds: to.totalSeconds - from.totalSeconds
     };
   }
 
-  function renderDowntimeView() {
+  async function renderDowntimeView() {
     const timeRange = validateDowntimeTimeRange();
     if (!timeRange) {
       clearAnalysisView();
       analysisLowerTableBody.innerHTML = '';
       return;
     }
+
+    await ensureDowntimeNormsLoaded();
+    await ensureNormaDlitLoaded();
 
     const filteredRows = getFilteredAnalysisRows(proizvodRows);
     if (!filteredRows.length) {
@@ -1958,8 +2325,9 @@
       return;
     }
 
-    renderAnalysisTable(proizvodColumns, filteredRows);
-    renderDowntimeTable(filteredRows, timeRange.timeFrom, timeRange.timeTo, timeRange.shiftTime);
+    const downtimeTopColumns = ['DateTimeStart', 'login', 'FIO', 'idWork', 'Work', 'Value', 'Год', 'Месяц', 'Дата', 'Час', 'Минута', 'Секунда'];
+    renderAnalysisTable(downtimeTopColumns, filteredRows);
+    renderDowntimeTable(filteredRows, timeRange.timeFrom, timeRange.timeTo, timeRange.shiftTime, timeRange.shiftSeconds);
   }
 
   function setFilterSelection(key, mode) {
@@ -1971,7 +2339,7 @@
       return;
     }
     if (currentAnalysisMode === 'downtime' && downtimeDisplayActivated) {
-      renderDowntimeView();
+      void renderDowntimeView();
       return;
     }
     if (currentAnalysisMode === 'downtime' && !downtimeDisplayActivated) {
@@ -1982,7 +2350,7 @@
 
   function renderCurrentChart() {
     if (currentAnalysisMode === 'downtime') {
-      renderDowntimeView();
+      void renderDowntimeView();
       return;
     }
     if (currentAnalysisMode === 'minute') {
@@ -2215,11 +2583,13 @@
       const d = parseRuDate(dateStr);
       const valid = d !== null;
       const h = valid ? d.getHours() : null;
+      const sourceIdWork = (row['idWork'] || row['OperationID'] || '').trim();
 
       return {
         'DateTimeStart': row['DateTimeStart'] || '',
         'login':         row['login']         || '',
         'FIO':           row['FIO']           || '',
+        'idWork':        sourceIdWork,
         'Work':          row['Work']          || '',
         'Value':         row['Value']         || '',
         'Год':     valid ? String(d.getFullYear())        : '',
@@ -2295,7 +2665,7 @@
 
       updateFilterButtonTitle(key);
       if (currentAnalysisMode === 'downtime' && downtimeDisplayActivated) {
-        renderDowntimeView();
+        void renderDowntimeView();
         return;
       }
       if (!(currentAnalysisMode === 'minute' && !minuteDisplayActivated)) {
@@ -2314,7 +2684,7 @@
 
     if (currentAnalysisMode === 'downtime') {
       downtimeDisplayActivated = true;
-      renderDowntimeView();
+      void renderDowntimeView();
     }
   });
 
