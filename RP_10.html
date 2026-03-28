@@ -21,7 +21,7 @@
     /* Шапка приложения с закладками */
     .header {
       display: flex;
-      padding: 12px 16px;
+      padding: 10px 16px;
       background: #111827;
       color: #f9fafb;
       font-size: 16px;
@@ -36,7 +36,7 @@
     }
 
     .tab {
-      padding: 8px 16px;
+      padding: 6px 16px;
       background: #1f2937;
       border-radius: 6px 6px 0 0;
       cursor: pointer;
@@ -78,7 +78,7 @@
     }
 
     .sidebar-resizer {
-      width: 6px;
+      width: 4px;
       background: #e5e7eb;
       cursor: col-resize;
       transition: background 0.2s;
@@ -307,10 +307,10 @@
     }
 
     .splitter {
-      height: 6px;
+      height: 4px;
       background: #e5e7eb;
       border-radius: 999px;
-      margin: 4px 0;
+      margin: 3px 0;
       cursor: row-resize;
       position: relative;
     }
@@ -321,7 +321,7 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      width: 60px;
+      width: 44px;
       height: 2px;
       border-radius: 999px;
       background: #9ca3af;
@@ -420,7 +420,7 @@
       flex-direction: column;
       gap: 10px;
       height: 100%;
-      padding: 10px;
+      padding: 10px 10px 0;
     }
 
     .analysis-filters {
@@ -434,8 +434,23 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      min-width: 170px;
-      max-width: 260px;
+      min-width: 136px;
+      max-width: 208px;
+    }
+
+    .analysis-filter-group-compact {
+      min-width: 109px;
+      max-width: 166px;
+    }
+
+    .analysis-filter-group-compact-25 {
+      min-width: 82px;
+      max-width: 125px;
+    }
+
+    .analysis-filter-group-default-25 {
+      min-width: 102px;
+      max-width: 156px;
     }
 
     .analysis-action-group {
@@ -445,7 +460,7 @@
     }
 
     .analysis-display-btn {
-      min-width: 110px;
+      min-width: 80px;
       height: 33px;
     }
 
@@ -471,7 +486,7 @@
       border-radius: 6px;
       background: #ffffff;
       overflow: auto;
-      padding: 10px;
+      padding: 10px 10px 0;
       display: none;
     }
 
@@ -513,6 +528,7 @@
       border: 1px solid #d1d5db;
       border-radius: 6px;
       padding: 7px 10px;
+      min-width: 136px;
       font-size: 12px;
       text-align: left;
       background: #ffffff;
@@ -521,6 +537,72 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .analysis-filter-group-compact .analysis-filter-btn {
+      min-width: 109px;
+    }
+
+    .analysis-filter-group-compact-25 .analysis-filter-btn {
+      min-width: 82px;
+    }
+
+    .analysis-filter-group-default-25 .analysis-filter-btn {
+      min-width: 102px;
+    }
+
+    #analysisNormTime {
+      width: 91px;
+    }
+
+    .analysis-work-group-near {
+      margin-left: -16px;
+    }
+
+    .analysis-sortable-header {
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .analysis-sortable-header::after {
+      content: "";
+      margin-left: 6px;
+      font-size: 10px;
+      color: #6b7280;
+    }
+
+    .analysis-sortable-header.sort-asc::after {
+      content: "▲";
+    }
+
+    .analysis-sortable-header.sort-desc::after {
+      content: "▼";
+    }
+
+    .analysis-table-filter-row th {
+      padding: 4px 6px;
+      background: #f9fafb;
+      position: sticky;
+      top: 40px;
+      z-index: 1;
+    }
+
+    .analysis-table-filter-input {
+      width: 100%;
+      min-width: 58px;
+      padding: 4px 6px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #111827;
+      background: #ffffff;
+    }
+
+    .analysis-table-filter-input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
     }
 
     .analysis-filter-btn:hover {
@@ -598,6 +680,48 @@
       background: #ffffff;
       overflow: auto;
       padding: 10px;
+    }
+
+    #analysisTopPanel .panel-body {
+      padding: 0;
+    }
+
+    #analysis-table-wrapper {
+      height: 100%;
+      max-height: none;
+      margin: 0;
+    }
+
+    .analysis-inline-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #374151;
+      white-space: nowrap;
+      user-select: none;
+      min-height: 33px;
+    }
+
+    .analysis-inline-toggle input[type="checkbox"] {
+      margin: 0;
+      accent-color: #2563eb;
+    }
+
+    .analysis-message-inline {
+      margin: 0;
+      padding: 0;
+      text-align: left;
+      min-width: 260px;
+      max-width: 520px;
+      align-self: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #analysis-tab .upload-content {
+      padding-bottom: 8px;
     }
 
     .analysis-chart {
@@ -811,7 +935,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="analysis-filter-group">
+                  <div class="analysis-filter-group analysis-filter-group-compact-25">
                     <div class="settings-label">Год</div>
                     <div class="analysis-filter-dropdown" data-filter-key="year">
                       <button id="analysisFilterBtnYear" class="analysis-filter-btn" type="button">Год: 0/0</button>
@@ -824,7 +948,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="analysis-filter-group">
+                  <div class="analysis-filter-group analysis-filter-group-compact">
                     <div class="settings-label">Месяц</div>
                     <div class="analysis-filter-dropdown" data-filter-key="month">
                       <button id="analysisFilterBtnMonth" class="analysis-filter-btn" type="button">Месяц: 0/0</button>
@@ -837,33 +961,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="analysis-filter-group">
-                    <div class="settings-label">Работа</div>
-                    <div class="analysis-filter-dropdown" data-filter-key="work">
-                      <button id="analysisFilterBtnWork" class="analysis-filter-btn" type="button">Работа: 0/0</button>
-                      <div id="analysisFilterMenuWork" class="analysis-filter-menu">
-                        <div class="analysis-filter-actions">
-                          <button id="analysisFilterAllWork" class="analysis-filter-action-btn" type="button">Все</button>
-                          <button id="analysisFilterNoneWork" class="analysis-filter-action-btn" type="button">Снять</button>
-                        </div>
-                        <div id="analysisFilterOptionsWork" class="analysis-filter-options"></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="analysis-filter-group">
-                    <div class="settings-label">Часы</div>
-                    <div class="analysis-filter-dropdown" data-filter-key="hour">
-                      <button id="analysisFilterBtnHour" class="analysis-filter-btn" type="button">Часы: 0/0</button>
-                      <div id="analysisFilterMenuHour" class="analysis-filter-menu">
-                        <div class="analysis-filter-actions">
-                          <button id="analysisFilterAllHour" class="analysis-filter-action-btn" type="button">Все</button>
-                          <button id="analysisFilterNoneHour" class="analysis-filter-action-btn" type="button">Снять</button>
-                        </div>
-                        <div id="analysisFilterOptionsHour" class="analysis-filter-options"></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="analysis-filter-group">
+                  <div class="analysis-filter-group analysis-filter-group-compact-25">
                     <div class="settings-label">Дата</div>
                     <div class="analysis-filter-dropdown" data-filter-key="date">
                       <button id="analysisFilterBtnDate" class="analysis-filter-btn" type="button">Дата: 0/0</button>
@@ -876,17 +974,43 @@
                       </div>
                     </div>
                   </div>
+                  <div class="analysis-filter-group analysis-filter-group-default-25">
+                    <div class="settings-label">Часы</div>
+                    <div class="analysis-filter-dropdown" data-filter-key="hour">
+                      <button id="analysisFilterBtnHour" class="analysis-filter-btn" type="button">Часы: 0/0</button>
+                      <div id="analysisFilterMenuHour" class="analysis-filter-menu">
+                        <div class="analysis-filter-actions">
+                          <button id="analysisFilterAllHour" class="analysis-filter-action-btn" type="button">Все</button>
+                          <button id="analysisFilterNoneHour" class="analysis-filter-action-btn" type="button">Снять</button>
+                        </div>
+                        <div id="analysisFilterOptionsHour" class="analysis-filter-options"></div>
+                      </div>
+                    </div>
+                  </div>
                   <div id="analysisTimeFromGroup" class="analysis-filter-group" style="display: none;">
                     <div class="settings-label">Часы с</div>
-                    <input id="analysisTimeFrom" class="analysis-time-input" type="text" inputmode="numeric" placeholder="ЧЧ:ММ:СС" />
+                    <input id="analysisTimeFrom" class="analysis-time-input" type="text" inputmode="numeric" placeholder="ДД.ММ.ГГГГ ЧЧ:ММ:СС" />
                   </div>
                   <div id="analysisTimeToGroup" class="analysis-filter-group" style="display: none;">
                     <div class="settings-label">Часы по</div>
-                    <input id="analysisTimeTo" class="analysis-time-input" type="text" inputmode="numeric" placeholder="ЧЧ:ММ:СС" value="18:00:00" />
+                    <input id="analysisTimeTo" class="analysis-time-input" type="text" inputmode="numeric" placeholder="ДД.ММ.ГГГГ ЧЧ:ММ:СС" value="18:00:00" />
                   </div>
                   <div id="analysisNormTimeGroup" class="analysis-filter-group" style="display: none;">
-                    <div class="settings-label">Нормативное время простоев</div>
+                    <div class="settings-label">Норм ВП</div>
                     <input id="analysisNormTime" class="analysis-time-input" type="text" inputmode="numeric" placeholder="ЧЧ:ММ:СС" value="08:00:00" />
+                  </div>
+                  <div class="analysis-filter-group analysis-work-group-near">
+                    <div class="settings-label">Работа</div>
+                    <div class="analysis-filter-dropdown" data-filter-key="work">
+                      <button id="analysisFilterBtnWork" class="analysis-filter-btn" type="button">Работа: 0/0</button>
+                      <div id="analysisFilterMenuWork" class="analysis-filter-menu">
+                        <div class="analysis-filter-actions">
+                          <button id="analysisFilterAllWork" class="analysis-filter-action-btn" type="button">Все</button>
+                          <button id="analysisFilterNoneWork" class="analysis-filter-action-btn" type="button">Снять</button>
+                        </div>
+                        <div id="analysisFilterOptionsWork" class="analysis-filter-options"></div>
+                      </div>
+                    </div>
                   </div>
                   <div class="analysis-filter-group analysis-action-group">
                     <button id="analysisDisplayBtn" class="btn btn-primary analysis-display-btn" type="button" style="display: none;">Отобразить</button>
@@ -894,8 +1018,16 @@
                   <div class="analysis-filter-group analysis-action-group">
                     <button id="analysisFullscreenBtn" class="btn analysis-display-btn" type="button" style="display: none;">На весь экран</button>
                   </div>
+                  <div id="analysisFinalOnlyGroup" class="analysis-filter-group analysis-action-group" style="display: none;">
+                    <label class="analysis-inline-toggle" for="analysisFinalOnlyCheckbox">
+                      <input id="analysisFinalOnlyCheckbox" type="checkbox" />
+                      <span>Только Финал &gt; 0</span>
+                    </label>
+                  </div>
+                  <div class="analysis-filter-group analysis-action-group" style="max-width: none;">
+                    <div id="analysis-message" class="directory-message analysis-message-inline">Выберите раздел анализа в боковом меню.</div>
+                  </div>
                 </div>
-                <div id="analysis-message" class="directory-message" style="padding: 0; text-align: left; margin-top: 0;">Выберите раздел анализа в боковом меню.</div>
                 <div id="analysisChartWrap" class="analysis-chart-wrap">
                   <div id="analysisChart" class="analysis-chart"></div>
                 </div>
@@ -912,7 +1044,9 @@
                         <th>Сумма простоев с.</th>
                         <th>Время выполнения</th>
                         <th>Расчетный простой</th>
-                        <th>Нормативное время простоев</th>
+                        <th>Норм ВП</th>
+                        <th>Инт простой</th>
+                        <th>Финал</th>
                       </tr>
                     </thead>
                     <tbody id="analysisLowerTableBody"></tbody>
@@ -1321,8 +1455,8 @@
     const map = new Map();
     directoryEditableRows.forEach(row => {
       const id = String(row.id ?? row.ID ?? '').trim();
-      const valueRaw = String(row.value ?? row.VALUE ?? '').trim().replace(',', '.');
-      const value = Number(valueRaw);
+      const valueRaw = String(row.value ?? row.VALUE ?? '').trim();
+      const value = parseNormDowntimeValueToSeconds(valueRaw);
       if (!id) return;
       if (!Number.isFinite(value)) return;
       map.set(id, value);
@@ -1353,8 +1487,8 @@
 
       parsed.rows.forEach(row => {
         const id = String(row.id ?? row.ID ?? '').trim();
-        const valueRaw = String(row.value ?? row.VALUE ?? '').trim().replace(',', '.');
-        const value = Number(valueRaw);
+        const valueRaw = String(row.value ?? row.VALUE ?? '').trim();
+        const value = parseNormDowntimeValueToSeconds(valueRaw);
         if (!id) return;
         if (!Number.isFinite(value)) return;
         map.set(id, value);
@@ -1948,6 +2082,8 @@
   const analysisNormTime = document.getElementById('analysisNormTime');
   const analysisDisplayBtn = document.getElementById('analysisDisplayBtn');
   const analysisFullscreenBtn = document.getElementById('analysisFullscreenBtn');
+  const analysisFinalOnlyGroup = document.getElementById('analysisFinalOnlyGroup');
+  const analysisFinalOnlyCheckbox = document.getElementById('analysisFinalOnlyCheckbox');
   const analysisSidebarToggleBtn = document.getElementById('analysisSidebarToggleBtn');
   const analysisTab = document.getElementById('analysis-tab');
 
@@ -1956,11 +2092,17 @@
   let currentAnalysisMode = 'hour'; // 'hour' | 'minute'
   let minuteDisplayActivated = false;
   let downtimeDisplayActivated = false;
+  let showOnlyFinalPositiveRows = false;
   let lastLoadedDbRoute = '';
 
   const DEFAULT_TIME_FROM = '08:00:00';
   const DEFAULT_TIME_TO = '18:00:00';
   const DEFAULT_DOWNTIME_NORM = '08:00:00';
+  const DOWNTIME_NORM_LABEL = 'Норм ВП';
+  const INTERVAL_DOWNTIME_LABEL = 'Инт простой';
+  const FINAL_DOWNTIME_LABEL = 'Финал';
+  const INTERVAL_DOWNTIME_FIELD = INTERVAL_DOWNTIME_LABEL;
+  const DOWNTIME_TOP_COLUMNS = ['DateTimeStart', 'login', 'FIO', 'idWork', 'Work', 'Value', 'Год', 'Месяц', 'Дата', 'Час', 'Минута', 'Секунда', DOWNTIME_NORM_LABEL, INTERVAL_DOWNTIME_FIELD, FINAL_DOWNTIME_LABEL];
 
   const MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь',
                      'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
@@ -1968,6 +2110,7 @@
     acc[item] = idx;
     return acc;
   }, {});
+  const SINGLE_SELECT_ANALYSIS_FILTERS = new Set(['year', 'month', 'date']);
 
   const analysisFilterState = {
     fio: { label: 'Сотрудник', field: 'FIO', options: [], selected: new Set() },
@@ -2027,6 +2170,48 @@
     return String(n).padStart(2, '0');
   }
 
+  function isSingleSelectAnalysisFilter(key) {
+    return SINGLE_SELECT_ANALYSIS_FILTERS.has(key);
+  }
+
+  function getSelectedAnalysisFilterValue(key) {
+    return Array.from(analysisFilterState[key].selected)[0] || '';
+  }
+
+  function getSelectedAnalysisDateBase() {
+    const year = getSelectedAnalysisFilterValue('year');
+    const monthLabel = getSelectedAnalysisFilterValue('month');
+    const day = getSelectedAnalysisFilterValue('date');
+    const monthIndex = MONTH_INDEX[monthLabel];
+    if (!year || !day || monthIndex === undefined) {
+      return null;
+    }
+
+    return {
+      day: pad2(Number(day)),
+      month: pad2(monthIndex + 1),
+      year: String(year)
+    };
+  }
+
+  function buildAnalysisDateTimeFromBase(dateBase, timeValue) {
+    return `${dateBase.day}.${dateBase.month}.${dateBase.year} ${timeValue}`;
+  }
+
+  function extractAnalysisTimePart(value) {
+    const dateTimeValue = parseAnalysisDateTimeValue(value);
+    if (dateTimeValue) {
+      return dateTimeValue.formatted.slice(11);
+    }
+
+    const timeValue = parseAnalysisTimeValue(value);
+    if (timeValue) {
+      return timeValue.formatted;
+    }
+
+    return '';
+  }
+
   // Парсинг даты формата DD.MM.YYYY HH:MM[:SS]
   function parseRuDate(str) {
     if (!str) return null;
@@ -2064,21 +2249,64 @@
   }
 
   function ensureDowntimeDefaults() {
-    if (!analysisTimeFrom.value.trim()) analysisTimeFrom.value = DEFAULT_TIME_FROM;
-    if (!analysisTimeTo.value.trim()) analysisTimeTo.value = DEFAULT_TIME_TO;
+    const selectedDateBase = getSelectedAnalysisDateBase();
+    if (selectedDateBase) {
+      if (!analysisTimeFrom.value.trim()) {
+        analysisTimeFrom.value = buildAnalysisDateTimeFromBase(selectedDateBase, DEFAULT_TIME_FROM);
+      }
+      if (!analysisTimeTo.value.trim()) {
+        analysisTimeTo.value = buildAnalysisDateTimeFromBase(selectedDateBase, DEFAULT_TIME_TO);
+      }
+    } else {
+      if (!analysisTimeFrom.value.trim()) analysisTimeFrom.value = DEFAULT_TIME_FROM;
+      if (!analysisTimeTo.value.trim()) analysisTimeTo.value = DEFAULT_TIME_TO;
+    }
     if (!analysisNormTime.value.trim()) analysisNormTime.value = DEFAULT_DOWNTIME_NORM;
   }
 
-  function normalizeTimeInputValue(inputEl, fallbackValue) {
-    const parsed = parseAnalysisTimeValue(inputEl.value);
-    if (parsed) {
-      inputEl.value = parsed.formatted;
+  function syncAnalysisTimeFieldsWithSelectedDate() {
+    const selectedDateBase = getSelectedAnalysisDateBase();
+    if (!selectedDateBase) {
+      analysisTimeFrom.value = '';
+      analysisTimeTo.value = '';
+      return;
+    }
+
+    const fromTimePart = extractAnalysisTimePart(analysisTimeFrom.value) || DEFAULT_TIME_FROM;
+    const toTimePart = extractAnalysisTimePart(analysisTimeTo.value) || DEFAULT_TIME_TO;
+    analysisTimeFrom.value = buildAnalysisDateTimeFromBase(selectedDateBase, fromTimePart);
+    analysisTimeTo.value = buildAnalysisDateTimeFromBase(selectedDateBase, toTimePart);
+  }
+
+  function normalizeTimeInputValue(inputEl, fallbackValue, allowDateTime = true) {
+    const selectedDateBase = getSelectedAnalysisDateBase();
+    if (allowDateTime) {
+      const dateTimeParsed = parseAnalysisDateTimeValue(inputEl.value);
+      if (dateTimeParsed) {
+        if (selectedDateBase) {
+          inputEl.value = buildAnalysisDateTimeFromBase(selectedDateBase, dateTimeParsed.formatted.slice(11));
+        } else {
+          inputEl.value = dateTimeParsed.formatted;
+        }
+        return true;
+      }
+    }
+
+    const timeParsed = parseAnalysisTimeValue(inputEl.value);
+    if (timeParsed) {
+      inputEl.value = allowDateTime && selectedDateBase
+        ? buildAnalysisDateTimeFromBase(selectedDateBase, timeParsed.formatted)
+        : timeParsed.formatted;
       return true;
     }
+
     if (!inputEl.value.trim()) {
-      inputEl.value = fallbackValue;
+      inputEl.value = allowDateTime && selectedDateBase
+        ? buildAnalysisDateTimeFromBase(selectedDateBase, fallbackValue)
+        : fallbackValue;
       return true;
     }
+
     return false;
   }
 
@@ -2107,6 +2335,11 @@
     analysisNormTimeGroup.style.display = isDowntime ? 'flex' : 'none';
     analysisDisplayBtn.style.display = (isMinute || isDowntime) ? 'inline-flex' : 'none';
     analysisFullscreenBtn.style.display = (isMinute || isDowntime) ? 'inline-flex' : 'none';
+    analysisFinalOnlyGroup.style.display = isDowntime ? 'inline-flex' : 'none';
+    if (!isDowntime) {
+      showOnlyFinalPositiveRows = false;
+      analysisFinalOnlyCheckbox.checked = false;
+    }
     analysisBottomTitle.textContent = isDowntime ? 'Таблица простоев' : 'График производительности';
     toggleAnalysisLowerContent(isDowntime ? 'downtime' : 'chart');
     if (isDowntime) {
@@ -2115,33 +2348,139 @@
     updateAnalysisFullscreenButton();
   }
 
-  function renderAnalysisTable(columns, rows) {
+  function renderAnalysisTable(columns, rows, rowClassResolver = null, options = {}) {
     clearAnalysisView();
-    if (!rows.length) {
+    const renderEmpty = Boolean(options.renderEmpty);
+    if (!rows.length && !renderEmpty) {
       setAnalysisMessage('Файл не содержит данных.', true);
       return;
     }
+    const enableColumnSorting = Boolean(options.enableColumnSorting ?? options.enableColumnTools);
+    const enableColumnFilters = Boolean(options.enableColumnFilters);
+    const filterState = enableColumnFilters ? Object.fromEntries(columns.map(col => [col, ''])) : {};
+    const sortState = { column: '', direction: 0 };
+
     const table = document.createElement('table');
     const thead = document.createElement('thead');
     const tbody = document.createElement('tbody');
 
     const headerRow = document.createElement('tr');
+    const sortableHeaders = new Map();
     columns.forEach(col => {
       const th = document.createElement('th');
       th.textContent = col;
+      if (enableColumnSorting) {
+        th.classList.add('analysis-sortable-header');
+        th.addEventListener('click', () => {
+          if (sortState.column !== col) {
+            sortState.column = col;
+            sortState.direction = 1;
+          } else if (sortState.direction === 1) {
+            sortState.direction = -1;
+          } else if (sortState.direction === -1) {
+            sortState.direction = 0;
+          } else {
+            sortState.direction = 1;
+          }
+          applyAndRender();
+        });
+        sortableHeaders.set(col, th);
+      }
       headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
 
-    rows.forEach(row => {
-      const tr = document.createElement('tr');
+    if (enableColumnFilters) {
+      const filterRow = document.createElement('tr');
+      filterRow.className = 'analysis-table-filter-row';
+
       columns.forEach(col => {
-        const td = document.createElement('td');
-        td.textContent = row[col] ?? '';
-        tr.appendChild(td);
+        const th = document.createElement('th');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'analysis-table-filter-input';
+        input.placeholder = 'Фильтр';
+        input.addEventListener('input', () => {
+          filterState[col] = input.value;
+          applyAndRender();
+        });
+        th.appendChild(input);
+        filterRow.appendChild(th);
       });
-      tbody.appendChild(tr);
-    });
+
+      thead.appendChild(filterRow);
+    }
+
+    const sourceRows = rows.slice();
+
+    function parseSortableNumeric(value) {
+      if (value === null || value === undefined) return null;
+      const normalized = String(value).trim().replace(',', '.');
+      if (!normalized) return null;
+      const num = Number(normalized);
+      return Number.isFinite(num) ? num : null;
+    }
+
+    function applyAndRender() {
+      let viewRows = sourceRows.slice();
+
+      if (enableColumnFilters) {
+        viewRows = viewRows.filter(row => columns.every(col => {
+          const filterValue = String(filterState[col] || '').trim().toLowerCase();
+          if (!filterValue) return true;
+          const rowValue = String(row[col] ?? '').toLowerCase();
+          return rowValue.includes(filterValue);
+        }));
+      }
+
+      if (sortState.direction !== 0 && sortState.column) {
+        const sortColumn = sortState.column;
+        const sortDirection = sortState.direction;
+        viewRows = viewRows.slice().sort((a, b) => {
+          const aRaw = a[sortColumn] ?? '';
+          const bRaw = b[sortColumn] ?? '';
+          const aNum = parseSortableNumeric(aRaw);
+          const bNum = parseSortableNumeric(bRaw);
+
+          if (aNum !== null && bNum !== null) {
+            return sortDirection * (aNum - bNum);
+          }
+
+          const aText = String(aRaw);
+          const bText = String(bRaw);
+          return sortDirection * aText.localeCompare(bText, 'ru', { numeric: true, sensitivity: 'base' });
+        });
+      }
+
+      sortableHeaders.forEach((th, col) => {
+        th.classList.remove('sort-asc', 'sort-desc');
+        if (sortState.column === col && sortState.direction === 1) {
+          th.classList.add('sort-asc');
+        }
+        if (sortState.column === col && sortState.direction === -1) {
+          th.classList.add('sort-desc');
+        }
+      });
+
+      tbody.innerHTML = '';
+      viewRows.forEach(row => {
+        const tr = document.createElement('tr');
+        if (typeof rowClassResolver === 'function') {
+          const className = rowClassResolver(row);
+          if (className) {
+            tr.classList.add(className);
+          }
+        }
+        columns.forEach(col => {
+          const td = document.createElement('td');
+          td.textContent = row[col] ?? '';
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    applyAndRender();
 
     table.appendChild(thead);
     table.appendChild(tbody);
@@ -2183,22 +2522,36 @@
     return seconds;
   }
 
-  function renderDowntimeTable(rows, timeFrom, timeTo, shiftTime, shiftSeconds, normTime, normSeconds) {
+  function renderDowntimeTable(rows, intervalRows, timeFrom, timeTo, shiftTime, shiftSeconds, normTime, normSeconds) {
     analysisLowerTableBody.innerHTML = '';
 
-    const uniqueFio = Array.from(new Set(rows.map(row => (row['FIO'] || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ru'));
+    const employeeFio = Array.from(new Set(rows.map(row => String(row['FIO'] || '').trim()).filter(Boolean)))
+      .sort((a, b) => a.localeCompare(b, 'ru', { numeric: true, sensitivity: 'base' }));
 
-    uniqueFio.forEach((fio, index) => {
-      const employeeRows = rows.filter(row => (row['FIO'] || '').trim() === fio);
+    employeeFio.forEach((fio, index) => {
+      const employeeRows = rows.filter(row => String(row['FIO'] || '').trim() === fio);
+      const employeeIntervalRows = intervalRows.filter(row => String(row['FIO'] || '').trim() === fio);
+      const employeeTopRows = intervalRows
+        .map(row => row.__topRow)
+        .filter(row => row && String(row['FIO'] || '').trim() === fio);
       const downtimeSum = calculateDowntimeEmployeeSum(employeeRows);
       const execTimeSeconds = calculateDowntimeEmployeeExecTime(employeeRows);
+      const intervalDowntimeSeconds = calculateIntervalDowntimeSum(employeeIntervalRows);
+      const finalSeconds = employeeTopRows.reduce((sum, row) => {
+        const finalRaw = String(row[FINAL_DOWNTIME_LABEL] || '').trim();
+        if (!finalRaw) return sum;
+        const parsed = parseDurationToSeconds(finalRaw);
+        return Number.isFinite(parsed) ? sum + parsed : sum;
+      }, 0);
       const execTimeFormatted = formatDurationFromSeconds(execTimeSeconds);
       const calcedDowntimeSeconds = Math.max(0, shiftSeconds - execTimeSeconds);
       const calcedDowntimeFormatted = formatDurationFromSeconds(calcedDowntimeSeconds);
       const downtimeSumFormatted = formatDurationFromSeconds(Math.round(downtimeSum));
+      const intervalDowntimeFormatted = formatDurationMinuteSecond(intervalDowntimeSeconds);
+      const finalFormatted = formatDurationFromSeconds(finalSeconds);
 
       const tr = document.createElement('tr');
-      if (calcedDowntimeSeconds > normSeconds) {
+      if (Number.isFinite(normSeconds) && finalSeconds > normSeconds) {
         tr.classList.add('analysis-row-alert');
       }
       tr.innerHTML = `
@@ -2211,16 +2564,18 @@
         <td>${execTimeFormatted}</td>
         <td>${calcedDowntimeFormatted}</td>
         <td>${normTime}</td>
+        <td>${intervalDowntimeFormatted}</td>
+        <td>${finalFormatted}</td>
       `;
       analysisLowerTableBody.appendChild(tr);
     });
 
-    if (!uniqueFio.length) {
+    if (!employeeFio.length) {
       setAnalysisMessage('Нет данных для построения таблицы простоев по выбранным фильтрам.', true);
       return;
     }
 
-    setAnalysisMessage(`Данные простоев отображены. Сотрудников: ${uniqueFio.length}.`, false);
+    setAnalysisMessage(`Данные простоев отображены. Сотрудников: ${employeeFio.length}. Розовым выделены строки, где Финал больше Норм ВП (из поля ввода).`, false);
   }
 
   function closeAllAnalysisFilterMenus() {
@@ -2251,15 +2606,28 @@
 
   function updateFilterButtonTitle(key) {
     const state = analysisFilterState[key];
+    if (isSingleSelectAnalysisFilter(key)) {
+      const selectedValue = Array.from(state.selected)[0] || 'не выбран';
+      analysisFilterDom[key].button.textContent = `${state.label}: ${selectedValue}`;
+      return;
+    }
+
     const selectedCount = state.selected.size;
     const totalCount = state.options.length;
     analysisFilterDom[key].button.textContent = `${state.label}: ${selectedCount}/${totalCount}`;
+  }
+
+  function updateAnalysisFilterActions(key) {
+    const isSingle = isSingleSelectAnalysisFilter(key);
+    analysisFilterDom[key].all.style.display = isSingle ? 'none' : 'inline-flex';
+    analysisFilterDom[key].none.textContent = isSingle ? 'Снять' : 'Снять';
   }
 
   function renderAnalysisFilterOptions(key) {
     const state = analysisFilterState[key];
     const optionsWrap = analysisFilterDom[key].options;
     optionsWrap.innerHTML = '';
+    updateAnalysisFilterActions(key);
 
     if (!state.options.length) {
       const empty = document.createElement('div');
@@ -2274,10 +2642,13 @@
       label.className = 'analysis-filter-option';
 
       const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
+      checkbox.type = isSingleSelectAnalysisFilter(key) ? 'radio' : 'checkbox';
       checkbox.className = 'analysis-filter-checkbox';
       checkbox.dataset.filterKey = key;
       checkbox.dataset.filterValue = value;
+      if (isSingleSelectAnalysisFilter(key)) {
+        checkbox.name = `analysis-filter-${key}`;
+      }
       checkbox.checked = state.selected.has(value);
 
       const text = document.createElement('span');
@@ -2289,15 +2660,92 @@
     });
   }
 
+  function refreshAnalysisFilterUi(key) {
+    renderAnalysisFilterOptions(key);
+    updateFilterButtonTitle(key);
+  }
+
+  function getAnalysisRowsFilteredForCascade(rows, key) {
+    return rows.filter(row => {
+      const year = (row['Год'] || '').trim();
+      const month = (row['Месяц'] || '').trim();
+
+      if (key === 'month') {
+        const selectedYear = Array.from(analysisFilterState.year.selected)[0] || '';
+        if (!selectedYear) return false;
+        return year === selectedYear;
+      }
+
+      if (key === 'date') {
+        const selectedYear = Array.from(analysisFilterState.year.selected)[0] || '';
+        const selectedMonth = Array.from(analysisFilterState.month.selected)[0] || '';
+        if (!selectedYear || !selectedMonth) return false;
+        return year === selectedYear && month === selectedMonth;
+      }
+
+      return true;
+    });
+  }
+
+  function getAnalysisCascadeOptions(rows, key) {
+    const field = analysisFilterState[key].field;
+    const filteredRows = getAnalysisRowsFilteredForCascade(rows, key);
+    const values = Array.from(new Set(filteredRows.map(row => (row[field] || '').trim()).filter(Boolean)));
+    return sortFilterValues(key, values);
+  }
+
+  function applyAnalysisSingleSelectCascade(rows, changedKey = null) {
+    const yearOptions = getAnalysisCascadeOptions(rows, 'year');
+    analysisFilterState.year.options = yearOptions;
+
+    const currentYear = Array.from(analysisFilterState.year.selected)[0] || '';
+    const nextYear = yearOptions.includes(currentYear)
+      ? currentYear
+      : changedKey === 'year' || changedKey === 'load'
+        ? (yearOptions[0] || '')
+        : '';
+    analysisFilterState.year.selected = nextYear ? new Set([nextYear]) : new Set();
+    refreshAnalysisFilterUi('year');
+
+    const shouldResetMonth = changedKey === 'year' || changedKey === 'load' || !nextYear;
+    const monthOptions = getAnalysisCascadeOptions(rows, 'month');
+    analysisFilterState.month.options = monthOptions;
+    const currentMonth = Array.from(analysisFilterState.month.selected)[0] || '';
+    const nextMonth = !nextYear
+      ? ''
+      : (monthOptions.includes(currentMonth) && !shouldResetMonth)
+        ? currentMonth
+        : (monthOptions[0] || '');
+    analysisFilterState.month.selected = nextMonth ? new Set([nextMonth]) : new Set();
+    refreshAnalysisFilterUi('month');
+
+    const shouldResetDate = changedKey === 'year' || changedKey === 'month' || changedKey === 'load' || !nextYear || !nextMonth;
+    const dateOptions = getAnalysisCascadeOptions(rows, 'date');
+    analysisFilterState.date.options = dateOptions;
+    const currentDate = Array.from(analysisFilterState.date.selected)[0] || '';
+    const nextDate = (!nextYear || !nextMonth)
+      ? ''
+      : (dateOptions.includes(currentDate) && !shouldResetDate)
+        ? currentDate
+        : (dateOptions[0] || '');
+    analysisFilterState.date.selected = nextDate ? new Set([nextDate]) : new Set();
+    refreshAnalysisFilterUi('date');
+    syncAnalysisTimeFieldsWithSelectedDate();
+  }
+
   function fillAnalysisFilters(rows) {
     Object.keys(analysisFilterState).forEach(key => {
       const field = analysisFilterState[key].field;
       const values = Array.from(new Set(rows.map(r => (r[field] || '').trim()).filter(Boolean)));
       analysisFilterState[key].options = sortFilterValues(key, values);
-      analysisFilterState[key].selected = new Set(analysisFilterState[key].options);
+      analysisFilterState[key].selected = isSingleSelectAnalysisFilter(key)
+        ? new Set()
+        : new Set(analysisFilterState[key].options);
       renderAnalysisFilterOptions(key);
       updateFilterButtonTitle(key);
     });
+
+    applyAnalysisSingleSelectCascade(rows, 'load');
   }
 
   function applyMinuteModeDefaults(rows) {
@@ -2342,12 +2790,16 @@
       const hour = (row['Час'] || '').trim();
       const date = (row['Дата'] || '').trim();
 
+      const matchesYear = yearSelected.size === 0 ? true : yearSelected.has(year);
+      const matchesMonth = monthSelected.size === 0 ? true : monthSelected.has(month);
+      const matchesDate = dateSelected.size === 0 ? true : dateSelected.has(date);
+
       return fioSelected.has(fio)
-        && yearSelected.has(year)
-        && monthSelected.has(month)
+        && matchesYear
+        && matchesMonth
         && workSelected.has(work)
         && hourSelected.has(hour)
-        && dateSelected.has(date);
+        && matchesDate;
     });
   }
 
@@ -2372,6 +2824,69 @@
     };
   }
 
+  function parseAnalysisDateTimeValue(value) {
+    const normalized = String(value || '').trim();
+    const match = normalized.match(/^(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2}):(\d{2})$/);
+    if (!match) {
+      return null;
+    }
+
+    const [, dayRaw, monthRaw, yearRaw, hourRaw, minuteRaw, secondRaw] = match;
+    const day = Number(dayRaw);
+    const month = Number(monthRaw);
+    const year = Number(yearRaw);
+    const hour = Number(hourRaw);
+    const minute = Number(minuteRaw);
+    const second = Number(secondRaw);
+
+    if (!Number.isInteger(day) || day < 1 || day > 31) return null;
+    if (!Number.isInteger(month) || month < 1 || month > 12) return null;
+    if (!Number.isInteger(year) || year < 1900 || year > 9999) return null;
+    if (!Number.isInteger(hour) || hour < 0 || hour > 23) return null;
+    if (!Number.isInteger(minute) || minute < 0 || minute > 59) return null;
+    if (!Number.isInteger(second) || second < 0 || second > 59) return null;
+
+    const date = new Date(year, month - 1, day, hour, minute, second);
+    if (
+      date.getFullYear() !== year
+      || date.getMonth() !== month - 1
+      || date.getDate() !== day
+      || date.getHours() !== hour
+      || date.getMinutes() !== minute
+      || date.getSeconds() !== second
+    ) {
+      return null;
+    }
+
+    return {
+      formatted: `${pad2(day)}.${pad2(month)}.${year} ${pad2(hour)}:${pad2(minute)}:${pad2(second)}`,
+      timestamp: date.getTime(),
+      date
+    };
+  }
+
+  function parseAnalysisDateTimeOrTimeValue(value) {
+    const dateTimeValue = parseAnalysisDateTimeValue(value);
+    if (dateTimeValue) {
+      return {
+        type: 'datetime',
+        formatted: dateTimeValue.formatted,
+        comparableValue: dateTimeValue.timestamp
+      };
+    }
+
+    const timeValue = parseAnalysisTimeValue(value);
+    if (timeValue) {
+      return {
+        type: 'time',
+        formatted: timeValue.formatted,
+        comparableValue: timeValue.totalSeconds
+      };
+    }
+
+    return null;
+  }
+
   function formatDurationFromSeconds(totalSeconds) {
     const safeSeconds = Math.max(0, totalSeconds);
     const hours = Math.floor(safeSeconds / 3600);
@@ -2380,29 +2895,204 @@
     return `${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`;
   }
 
+  function formatDurationMinuteSecond(totalSeconds) {
+    const safeSeconds = Math.max(0, totalSeconds);
+    const minutes = Math.floor(safeSeconds / 60);
+    const seconds = safeSeconds % 60;
+    return `${pad2(minutes)}:${pad2(seconds)}`;
+  }
+
+  function parseDurationToSeconds(valueRaw) {
+    const normalized = String(valueRaw || '').trim();
+    if (!normalized) return NaN;
+
+    const hhmmss = normalized.match(/^(\d{1,4}):(\d{2}):(\d{2})$/);
+    if (hhmmss) {
+      const hours = Number(hhmmss[1]);
+      const minutes = Number(hhmmss[2]);
+      const seconds = Number(hhmmss[3]);
+      if (!Number.isInteger(hours) || hours < 0) return NaN;
+      if (!Number.isInteger(minutes) || minutes < 0 || minutes > 59) return NaN;
+      if (!Number.isInteger(seconds) || seconds < 0 || seconds > 59) return NaN;
+      return (hours * 3600) + (minutes * 60) + seconds;
+    }
+
+    const mmss = normalized.match(/^(\d{1,6}):(\d{2})$/);
+    if (mmss) {
+      const minutes = Number(mmss[1]);
+      const seconds = Number(mmss[2]);
+      if (!Number.isInteger(minutes) || minutes < 0) return NaN;
+      if (!Number.isInteger(seconds) || seconds < 0 || seconds > 59) return NaN;
+      return (minutes * 60) + seconds;
+    }
+
+    return NaN;
+  }
+
+  function formatDateTimeDisplayWithSeconds(valueRaw) {
+    const normalized = String(valueRaw || '').trim();
+    const date = parseRuDate(normalized);
+    if (!date) return normalized;
+    return `${pad2(date.getDate())}.${pad2(date.getMonth() + 1)}.${date.getFullYear()} ${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())}`;
+  }
+
+  function parseNormDowntimeValueToSeconds(valueRaw) {
+    const normalized = String(valueRaw || '').trim();
+    if (!normalized) return NaN;
+
+    const mmssMatch = normalized.match(/^(\d{1,4}):(\d{2})$/);
+    if (mmssMatch) {
+      const minutes = Number(mmssMatch[1]);
+      const seconds = Number(mmssMatch[2]);
+      if (!Number.isInteger(minutes) || minutes < 0) return NaN;
+      if (!Number.isInteger(seconds) || seconds < 0 || seconds > 59) return NaN;
+      return (minutes * 60) + seconds;
+    }
+
+    const hhmmssMatch = normalized.match(/^(\d{1,3}):(\d{2}):(\d{2})$/);
+    if (hhmmssMatch) {
+      const hours = Number(hhmmssMatch[1]);
+      const minutes = Number(hhmmssMatch[2]);
+      const seconds = Number(hhmmssMatch[3]);
+      if (!Number.isInteger(hours) || hours < 0) return NaN;
+      if (!Number.isInteger(minutes) || minutes < 0 || minutes > 59) return NaN;
+      if (!Number.isInteger(seconds) || seconds < 0 || seconds > 59) return NaN;
+      return (hours * 3600) + (minutes * 60) + seconds;
+    }
+
+    const numeric = Number(normalized.replace(',', '.'));
+    if (!Number.isFinite(numeric)) return NaN;
+    return Math.max(0, Math.round(numeric));
+  }
+
+  function enrichDowntimeTopRows(rows) {
+    return rows.map(row => {
+      const idWork = String(row.idWork ?? '').trim();
+      const hasNorm = idWork && downtimeNormsMap.has(idWork);
+      const normSeconds = hasNorm ? Number(downtimeNormsMap.get(idWork)) : NaN;
+      const intervalSeconds = Number(row.__intervalDowntimeSeconds || 0);
+      const isOverNorm = Number.isFinite(normSeconds) && intervalSeconds > normSeconds;
+      const finalSeconds = isOverNorm ? (intervalSeconds - normSeconds) : 0;
+
+      return {
+        ...row,
+        DateTimeStart: formatDateTimeDisplayWithSeconds(row.DateTimeStart),
+        [DOWNTIME_NORM_LABEL]: Number.isFinite(normSeconds) ? formatDurationMinuteSecond(normSeconds) : '',
+        [INTERVAL_DOWNTIME_FIELD]: formatDurationMinuteSecond(intervalSeconds),
+        [FINAL_DOWNTIME_LABEL]: Number.isFinite(normSeconds)
+          ? (isOverNorm ? formatDurationMinuteSecond(finalSeconds) : '00:00')
+          : '',
+        __finalSeconds: Number.isFinite(normSeconds) ? finalSeconds : 0,
+        __isIntervalOverNorm: isOverNorm
+      };
+    });
+  }
+
+  function getIntervalDowntimeComparableRows(rows) {
+    const groups = new Map();
+
+    rows.forEach((row, index) => {
+      const login = String(row['login'] || '').trim();
+      const date = parseRuDate((row['DateTimeStart'] || '').trim());
+      if (!date) return;
+      if (!groups.has(login)) {
+        groups.set(login, []);
+      }
+      groups.get(login).push({ row, timestamp: date.getTime(), originalIndex: index });
+    });
+
+    return Array.from(groups.entries())
+      .sort((a, b) => a[0].localeCompare(b[0], 'ru', { numeric: true, sensitivity: 'base' }))
+      .flatMap(([, items]) => items.sort((a, b) => {
+        if (a.timestamp !== b.timestamp) return a.timestamp - b.timestamp;
+        return a.originalIndex - b.originalIndex;
+      }));
+  }
+
+  function calculateIntervalDowntimeRows(rows, fromTimestamp) {
+    const rowsByLogin = new Map();
+
+    getIntervalDowntimeComparableRows(rows).forEach(item => {
+      const login = String(item.row['login'] || '').trim();
+      if (!rowsByLogin.has(login)) {
+        rowsByLogin.set(login, []);
+      }
+      rowsByLogin.get(login).push(item);
+    });
+
+    const result = [];
+    rowsByLogin.forEach(items => {
+      let previousTimestamp = null;
+      let previousDateTime = '';
+
+      items.forEach(item => {
+        const currentDateTime = String(item.row['DateTimeStart'] || '').trim();
+        if (currentDateTime === previousDateTime) {
+          return;
+        }
+
+        const baseTimestamp = previousTimestamp ?? fromTimestamp;
+        const intervalSeconds = Math.max(0, Math.floor((item.timestamp - baseTimestamp) / 1000));
+
+        result.push({
+          ...item.row,
+          [INTERVAL_DOWNTIME_FIELD]: formatDurationMinuteSecond(intervalSeconds),
+          __intervalDowntimeSeconds: intervalSeconds
+        });
+
+        previousTimestamp = item.timestamp;
+        previousDateTime = currentDateTime;
+      });
+    });
+
+    return result;
+  }
+
+  function calculateIntervalDowntimeSum(rowsByEmployee) {
+    return rowsByEmployee.reduce((sum, row) => {
+      const intervalSeconds = Number(row.__intervalDowntimeSeconds || 0);
+      return Number.isFinite(intervalSeconds) ? sum + intervalSeconds : sum;
+    }, 0);
+  }
+
+  function filterDowntimeRowsByDateTimeRange(rows, fromTimestamp, toTimestamp) {
+    return rows.filter(row => {
+      const rowDate = parseRuDate((row['DateTimeStart'] || '').trim());
+      if (!rowDate) return false;
+      const timestamp = rowDate.getTime();
+      return timestamp >= fromTimestamp && timestamp <= toTimestamp;
+    });
+  }
+
   function validateDowntimeTimeRange() {
     ensureDowntimeDefaults();
 
-    const from = parseAnalysisTimeValue(analysisTimeFrom.value);
-    if (!from) {
-      setAnalysisMessage('Поле «Часы с» должно быть в формате ЧЧ:ММ:СС.', true);
+    const selectedDateBase = getSelectedAnalysisDateBase();
+    if (!selectedDateBase) {
+      setAnalysisMessage('Для режима «Простои» выберите дату.', true);
       return null;
     }
 
-    const to = parseAnalysisTimeValue(analysisTimeTo.value);
-    if (!to) {
-      setAnalysisMessage('Поле «Часы по» должно быть в формате ЧЧ:ММ:СС.', true);
+    const from = parseAnalysisDateTimeOrTimeValue(analysisTimeFrom.value);
+    if (!from || from.type !== 'datetime') {
+      setAnalysisMessage('Поле «Часы с» должно быть в формате ДД.ММ.ГГГГ ЧЧ:ММ:СС.', true);
       return null;
     }
 
-    if (to.totalSeconds < from.totalSeconds) {
+    const to = parseAnalysisDateTimeOrTimeValue(analysisTimeTo.value);
+    if (!to || to.type !== 'datetime') {
+      setAnalysisMessage('Поле «Часы по» должно быть в формате ДД.ММ.ГГГГ ЧЧ:ММ:СС.', true);
+      return null;
+    }
+
+    if (to.comparableValue < from.comparableValue) {
       setAnalysisMessage('Значение «Часы по» должно быть больше либо равно «Часы с».', true);
       return null;
     }
 
     const norm = parseAnalysisTimeValue(analysisNormTime.value);
     if (!norm) {
-      setAnalysisMessage('Поле «Нормативное время простоев» должно быть в формате ЧЧ:ММ:СС.', true);
+      setAnalysisMessage(`Поле «${DOWNTIME_NORM_LABEL}» должно быть в формате ЧЧ:ММ:СС.`, true);
       return null;
     }
 
@@ -2413,10 +3103,12 @@
     return {
       timeFrom: from.formatted,
       timeTo: to.formatted,
-      shiftTime: formatDurationFromSeconds(to.totalSeconds - from.totalSeconds),
-      shiftSeconds: to.totalSeconds - from.totalSeconds,
+      shiftTime: formatDurationFromSeconds(Math.floor((to.comparableValue - from.comparableValue) / 1000)),
+      shiftSeconds: Math.floor((to.comparableValue - from.comparableValue) / 1000),
       normTime: norm.formatted,
-      normSeconds: norm.totalSeconds
+      normSeconds: norm.totalSeconds,
+      fromTimestamp: from.comparableValue,
+      toTimestamp: to.comparableValue
     };
   }
 
@@ -2432,17 +3124,37 @@
     await ensureNormaDlitLoaded();
 
     const filteredRows = getFilteredAnalysisRows(proizvodRows);
-    if (!filteredRows.length) {
+    const filteredRowsInRange = filterDowntimeRowsByDateTimeRange(
+      filteredRows,
+      timeRange.fromTimestamp,
+      timeRange.toTimestamp
+    );
+    const intervalDowntimeRows = calculateIntervalDowntimeRows(filteredRowsInRange, timeRange.fromTimestamp);
+    const downtimeTopRows = enrichDowntimeTopRows(intervalDowntimeRows);
+    const visibleTopRows = showOnlyFinalPositiveRows
+      ? downtimeTopRows.filter(row => Number(row.__finalSeconds || 0) > 0)
+      : downtimeTopRows;
+
+    if (!downtimeTopRows.length) {
       clearAnalysisView();
       analysisLowerTableBody.innerHTML = '';
-      setAnalysisMessage('Нет данных для отображения простоев по выбранным фильтрам.', true);
+      setAnalysisMessage('Нет данных для отображения простоев по выбранным фильтрам и интервалу.', true);
       return;
     }
 
-    const downtimeTopColumns = ['DateTimeStart', 'login', 'FIO', 'idWork', 'Work', 'Value', 'Год', 'Месяц', 'Дата', 'Час', 'Минута', 'Секунда'];
-    renderAnalysisTable(downtimeTopColumns, filteredRows);
+    renderAnalysisTable(
+      DOWNTIME_TOP_COLUMNS,
+      visibleTopRows,
+      row => row.__isIntervalOverNorm ? 'analysis-row-alert' : '',
+      { enableColumnSorting: true, enableColumnFilters: false, renderEmpty: true }
+    );
+    const intervalRowsWithTop = intervalDowntimeRows.map((row, index) => ({
+      ...row,
+      __topRow: downtimeTopRows[index] || null
+    }));
     renderDowntimeTable(
-      filteredRows,
+      filteredRowsInRange,
+      intervalRowsWithTop,
       timeRange.timeFrom,
       timeRange.timeTo,
       timeRange.shiftTime,
@@ -2454,6 +3166,39 @@
 
   function setFilterSelection(key, mode) {
     const state = analysisFilterState[key];
+    if (isSingleSelectAnalysisFilter(key)) {
+      if (mode === 'none') {
+        state.selected = new Set();
+        if (key === 'year') {
+          analysisFilterState.month.selected = new Set();
+          analysisFilterState.month.options = [];
+          analysisFilterState.date.selected = new Set();
+          analysisFilterState.date.options = [];
+          refreshAnalysisFilterUi('month');
+          refreshAnalysisFilterUi('date');
+        }
+        if (key === 'month') {
+          analysisFilterState.date.selected = new Set();
+          analysisFilterState.date.options = [];
+          refreshAnalysisFilterUi('date');
+        }
+      }
+      refreshAnalysisFilterUi(key);
+      syncAnalysisTimeFieldsWithSelectedDate();
+      if (currentAnalysisMode === 'minute' && !minuteDisplayActivated) {
+        return;
+      }
+      if (currentAnalysisMode === 'downtime' && downtimeDisplayActivated) {
+        void renderDowntimeView();
+        return;
+      }
+      if (currentAnalysisMode === 'downtime' && !downtimeDisplayActivated) {
+        return;
+      }
+      renderCurrentChart();
+      return;
+    }
+
     state.selected = mode === 'all' ? new Set(state.options) : new Set();
     renderAnalysisFilterOptions(key);
     updateFilterButtonTitle(key);
@@ -2770,6 +3515,7 @@
 
     dom.all.addEventListener('click', (event) => {
       event.stopPropagation();
+      if (isSingleSelectAnalysisFilter(key)) return;
       setFilterSelection(key, 'all');
     });
 
@@ -2783,13 +3529,23 @@
       if (!target.classList.contains('analysis-filter-checkbox')) return;
 
       const value = target.dataset.filterValue;
-      if (target.checked) {
+      if (isSingleSelectAnalysisFilter(key)) {
+        analysisFilterState[key].selected = target.checked ? new Set([value]) : new Set();
+        if (key === 'year' || key === 'month') {
+          applyAnalysisSingleSelectCascade(proizvodRows, key);
+        } else {
+          refreshAnalysisFilterUi(key);
+          syncAnalysisTimeFieldsWithSelectedDate();
+        }
+      } else if (target.checked) {
         analysisFilterState[key].selected.add(value);
       } else {
         analysisFilterState[key].selected.delete(value);
       }
 
-      updateFilterButtonTitle(key);
+      if (!isSingleSelectAnalysisFilter(key)) {
+        updateFilterButtonTitle(key);
+      }
       if (currentAnalysisMode === 'downtime' && downtimeDisplayActivated) {
         void renderDowntimeView();
         return;
@@ -2884,7 +3640,14 @@
   });
 
   analysisNormTime.addEventListener('blur', () => {
-    normalizeTimeInputValue(analysisNormTime, DEFAULT_DOWNTIME_NORM);
+    normalizeTimeInputValue(analysisNormTime, DEFAULT_DOWNTIME_NORM, false);
+    if (currentAnalysisMode === 'downtime' && downtimeDisplayActivated) {
+      void renderDowntimeView();
+    }
+  });
+
+  analysisFinalOnlyCheckbox.addEventListener('change', () => {
+    showOnlyFinalPositiveRows = analysisFinalOnlyCheckbox.checked;
     if (currentAnalysisMode === 'downtime' && downtimeDisplayActivated) {
       void renderDowntimeView();
     }
