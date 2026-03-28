@@ -69,6 +69,27 @@
       transition: all 0.3s ease;
     }
 
+    .sidebar.analysis-collapsed {
+      width: 0 !important;
+      min-width: 0 !important;
+      padding: 0 !important;
+      border-right: none !important;
+      overflow: hidden;
+    }
+
+    .sidebar-resizer {
+      width: 6px;
+      background: #e5e7eb;
+      cursor: col-resize;
+      transition: background 0.2s;
+      display: none;
+    }
+
+    .sidebar-resizer:hover,
+    .sidebar-resizer.active {
+      background: #93c5fd;
+    }
+
     /* ✅ СКРЫТАЯ БОКОВАЯ ПАНЕЛЬ */
     .sidebar.hidden {
       width: 0;
@@ -461,13 +482,21 @@
       margin-bottom: 10px;
     }
 
-    .analysis-chart-wrap:fullscreen {
-      background: #ffffff;
-      padding: 16px;
+    .analysis-row-alert td {
+      background: #fbcfe8 !important;
     }
 
-    .analysis-chart-wrap:fullscreen .analysis-chart {
-      min-height: calc(100vh - 80px);
+    #analysis-tab:fullscreen {
+      background: #ffffff;
+      padding: 10px;
+    }
+
+    #analysis-tab:fullscreen .upload-content {
+      height: calc(100vh - 20px);
+    }
+
+    #analysis-tab:fullscreen .analysis-chart {
+      min-height: calc(100vh - 220px);
     }
 
     .analysis-filter-group .settings-label {
@@ -688,6 +717,7 @@
         </label>
       </div>
     </div>
+    <div id="analysisSidebarResizer" class="sidebar-resizer"></div>
 
     <!-- ✅ ПРАВАЯ ОБЛАСТЬ -->
     <div class="content-area">
@@ -752,6 +782,7 @@
           <div id="analysisTopPanel" class="panel" style="flex-basis: 55%;">
             <div class="panel-header">
               <div id="analysis-title">Анализ</div>
+              <button id="analysisSidebarToggleBtn" class="btn" type="button" style="padding: 4px 10px; font-size: 12px;">Свернуть панель</button>
             </div>
             <div class="panel-body">
               <div id="analysis-table-wrapper" class="directory-table-wrapper"></div>
@@ -851,7 +882,11 @@
                   </div>
                   <div id="analysisTimeToGroup" class="analysis-filter-group" style="display: none;">
                     <div class="settings-label">Часы по</div>
-                    <input id="analysisTimeTo" class="analysis-time-input" type="text" inputmode="numeric" placeholder="ЧЧ:ММ:СС" />
+                    <input id="analysisTimeTo" class="analysis-time-input" type="text" inputmode="numeric" placeholder="ЧЧ:ММ:СС" value="18:00:00" />
+                  </div>
+                  <div id="analysisNormTimeGroup" class="analysis-filter-group" style="display: none;">
+                    <div class="settings-label">Нормативное время простоев</div>
+                    <input id="analysisNormTime" class="analysis-time-input" type="text" inputmode="numeric" placeholder="ЧЧ:ММ:СС" value="08:00:00" />
                   </div>
                   <div class="analysis-filter-group analysis-action-group">
                     <button id="analysisDisplayBtn" class="btn btn-primary analysis-display-btn" type="button" style="display: none;">Отобразить</button>
@@ -877,6 +912,7 @@
                         <th>Сумма простоев с.</th>
                         <th>Время выполнения</th>
                         <th>Расчетный простой</th>
+                        <th>Нормативное время простоев</th>
                       </tr>
                     </thead>
                     <tbody id="analysisLowerTableBody"></tbody>
@@ -951,13 +987,37 @@
   const tabContents = document.querySelectorAll('.tab-content');
   const sidebar = document.getElementById('sidebar');
   const analysisSidebar = document.getElementById('analysisSidebar');
+  const analysisSidebarResizer = document.getElementById('analysisSidebarResizer');
   const mainContent = document.getElementById('mainContent');
   const bottomBar = document.getElementById('bottomBar');
+  let analysisSidebarCollapsed = false;
+  let analysisSidebarWidthPx = 260;
+
+  function resetHiddenSidebarStyle(sidebarNode) {
+    sidebarNode.style.width = '';
+    sidebarNode.style.minWidth = '';
+    sidebarNode.style.padding = '';
+    sidebarNode.style.borderRight = '';
+  }
+
+  function applyAnalysisSidebarState() {
+    if (analysisSidebarCollapsed) {
+      analysisSidebar.classList.add('analysis-collapsed');
+      analysisSidebarResizer.style.display = 'none';
+    } else {
+      analysisSidebar.classList.remove('analysis-collapsed');
+      analysisSidebar.style.width = `${analysisSidebarWidthPx}px`;
+      analysisSidebar.style.minWidth = `${analysisSidebarWidthPx}px`;
+      analysisSidebarResizer.style.display = analysisSidebar.classList.contains('hidden') ? 'none' : 'block';
+    }
+  }
 
   function updateSidebarsByTab(tabId) {
     if (tabId === 'directory') {
       sidebar.classList.remove('hidden');
       analysisSidebar.classList.add('hidden');
+      analysisSidebarResizer.style.display = 'none';
+      resetHiddenSidebarStyle(analysisSidebar);
       mainContent.classList.remove('sidebar-hidden');
       return;
     }
@@ -965,12 +1025,17 @@
     if (tabId === 'analysis' || tabId === 'instructions') {
       sidebar.classList.add('hidden');
       analysisSidebar.classList.remove('hidden');
+      resetHiddenSidebarStyle(sidebar);
       mainContent.classList.remove('sidebar-hidden');
+      applyAnalysisSidebarState();
       return;
     }
 
     sidebar.classList.add('hidden');
     analysisSidebar.classList.add('hidden');
+    analysisSidebarResizer.style.display = 'none';
+    resetHiddenSidebarStyle(sidebar);
+    resetHiddenSidebarStyle(analysisSidebar);
     mainContent.classList.add('sidebar-hidden');
   }
 
@@ -1877,16 +1942,25 @@
   const analysisLowerTableBody = document.getElementById('analysisLowerTableBody');
   const analysisTimeFromGroup = document.getElementById('analysisTimeFromGroup');
   const analysisTimeToGroup = document.getElementById('analysisTimeToGroup');
+  const analysisNormTimeGroup = document.getElementById('analysisNormTimeGroup');
   const analysisTimeFrom = document.getElementById('analysisTimeFrom');
   const analysisTimeTo = document.getElementById('analysisTimeTo');
+  const analysisNormTime = document.getElementById('analysisNormTime');
   const analysisDisplayBtn = document.getElementById('analysisDisplayBtn');
   const analysisFullscreenBtn = document.getElementById('analysisFullscreenBtn');
+  const analysisSidebarToggleBtn = document.getElementById('analysisSidebarToggleBtn');
+  const analysisTab = document.getElementById('analysis-tab');
 
   let proizvodRows = [];
   let proizvodColumns = [];
   let currentAnalysisMode = 'hour'; // 'hour' | 'minute'
   let minuteDisplayActivated = false;
   let downtimeDisplayActivated = false;
+  let lastLoadedDbRoute = '';
+
+  const DEFAULT_TIME_FROM = '08:00:00';
+  const DEFAULT_TIME_TO = '18:00:00';
+  const DEFAULT_DOWNTIME_NORM = '08:00:00';
 
   const MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь',
                      'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
@@ -1980,20 +2054,37 @@
     });
     proizvodRows = [];
     proizvodColumns = [];
-    minuteDisplayActivated = false;
-    downtimeDisplayActivated = false;
+    lastLoadedDbRoute = '';
     analysisDisplayBtn.style.display = 'none';
     analysisFullscreenBtn.style.display = 'none';
     analysisTimeFromGroup.style.display = 'none';
     analysisTimeToGroup.style.display = 'none';
-    analysisTimeFrom.value = '';
-    analysisTimeTo.value = '';
+    analysisNormTimeGroup.style.display = 'none';
     analysisBottomTitle.textContent = 'График производительности';
   }
 
+  function ensureDowntimeDefaults() {
+    if (!analysisTimeFrom.value.trim()) analysisTimeFrom.value = DEFAULT_TIME_FROM;
+    if (!analysisTimeTo.value.trim()) analysisTimeTo.value = DEFAULT_TIME_TO;
+    if (!analysisNormTime.value.trim()) analysisNormTime.value = DEFAULT_DOWNTIME_NORM;
+  }
+
+  function normalizeTimeInputValue(inputEl, fallbackValue) {
+    const parsed = parseAnalysisTimeValue(inputEl.value);
+    if (parsed) {
+      inputEl.value = parsed.formatted;
+      return true;
+    }
+    if (!inputEl.value.trim()) {
+      inputEl.value = fallbackValue;
+      return true;
+    }
+    return false;
+  }
+
   function updateAnalysisFullscreenButton() {
-    const isFullscreen = document.fullscreenElement === analysisChartWrap;
-    analysisFullscreenBtn.textContent = isFullscreen ? 'Свернуть' : 'На весь экран';
+    const isFullscreen = document.fullscreenElement === analysisTab;
+    analysisFullscreenBtn.textContent = isFullscreen ? 'Обычный вид' : 'На весь экран';
   }
 
   function setAnalysisMessage(text, isError = false) {
@@ -2013,10 +2104,14 @@
 
     analysisTimeFromGroup.style.display = isDowntime ? 'flex' : 'none';
     analysisTimeToGroup.style.display = isDowntime ? 'flex' : 'none';
+    analysisNormTimeGroup.style.display = isDowntime ? 'flex' : 'none';
     analysisDisplayBtn.style.display = (isMinute || isDowntime) ? 'inline-flex' : 'none';
-    analysisFullscreenBtn.style.display = isMinute ? 'inline-flex' : 'none';
+    analysisFullscreenBtn.style.display = (isMinute || isDowntime) ? 'inline-flex' : 'none';
     analysisBottomTitle.textContent = isDowntime ? 'Таблица простоев' : 'График производительности';
     toggleAnalysisLowerContent(isDowntime ? 'downtime' : 'chart');
+    if (isDowntime) {
+      ensureDowntimeDefaults();
+    }
     updateAnalysisFullscreenButton();
   }
 
@@ -2088,7 +2183,7 @@
     return seconds;
   }
 
-  function renderDowntimeTable(rows, timeFrom, timeTo, shiftTime, shiftSeconds) {
+  function renderDowntimeTable(rows, timeFrom, timeTo, shiftTime, shiftSeconds, normTime, normSeconds) {
     analysisLowerTableBody.innerHTML = '';
 
     const uniqueFio = Array.from(new Set(rows.map(row => (row['FIO'] || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ru'));
@@ -2100,17 +2195,22 @@
       const execTimeFormatted = formatDurationFromSeconds(execTimeSeconds);
       const calcedDowntimeSeconds = Math.max(0, shiftSeconds - execTimeSeconds);
       const calcedDowntimeFormatted = formatDurationFromSeconds(calcedDowntimeSeconds);
+      const downtimeSumFormatted = formatDurationFromSeconds(Math.round(downtimeSum));
 
       const tr = document.createElement('tr');
+      if (calcedDowntimeSeconds > normSeconds) {
+        tr.classList.add('analysis-row-alert');
+      }
       tr.innerHTML = `
         <td>${index + 1}</td>
         <td>${fio}</td>
         <td>${timeFrom}</td>
         <td>${timeTo}</td>
         <td>${shiftTime}</td>
-        <td>${downtimeSum.toFixed(2)}</td>
+        <td>${downtimeSumFormatted}</td>
         <td>${execTimeFormatted}</td>
         <td>${calcedDowntimeFormatted}</td>
+        <td>${normTime}</td>
       `;
       analysisLowerTableBody.appendChild(tr);
     });
@@ -2281,6 +2381,8 @@
   }
 
   function validateDowntimeTimeRange() {
+    ensureDowntimeDefaults();
+
     const from = parseAnalysisTimeValue(analysisTimeFrom.value);
     if (!from) {
       setAnalysisMessage('Поле «Часы с» должно быть в формате ЧЧ:ММ:СС.', true);
@@ -2298,11 +2400,23 @@
       return null;
     }
 
+    const norm = parseAnalysisTimeValue(analysisNormTime.value);
+    if (!norm) {
+      setAnalysisMessage('Поле «Нормативное время простоев» должно быть в формате ЧЧ:ММ:СС.', true);
+      return null;
+    }
+
+    analysisTimeFrom.value = from.formatted;
+    analysisTimeTo.value = to.formatted;
+    analysisNormTime.value = norm.formatted;
+
     return {
       timeFrom: from.formatted,
       timeTo: to.formatted,
       shiftTime: formatDurationFromSeconds(to.totalSeconds - from.totalSeconds),
-      shiftSeconds: to.totalSeconds - from.totalSeconds
+      shiftSeconds: to.totalSeconds - from.totalSeconds,
+      normTime: norm.formatted,
+      normSeconds: norm.totalSeconds
     };
   }
 
@@ -2327,7 +2441,15 @@
 
     const downtimeTopColumns = ['DateTimeStart', 'login', 'FIO', 'idWork', 'Work', 'Value', 'Год', 'Месяц', 'Дата', 'Час', 'Минута', 'Секунда'];
     renderAnalysisTable(downtimeTopColumns, filteredRows);
-    renderDowntimeTable(filteredRows, timeRange.timeFrom, timeRange.timeTo, timeRange.shiftTime, timeRange.shiftSeconds);
+    renderDowntimeTable(
+      filteredRows,
+      timeRange.timeFrom,
+      timeRange.timeTo,
+      timeRange.shiftTime,
+      timeRange.shiftSeconds,
+      timeRange.normTime,
+      timeRange.normSeconds
+    );
   }
 
   function setFilterSelection(key, mode) {
@@ -2603,14 +2725,18 @@
 
     proizvodColumns = outputCols;
     proizvodRows = outputRows;
+    lastLoadedDbRoute = dbRouteSelect.value;
     fillAnalysisFilters(outputRows);
 
     if (currentAnalysisMode === 'downtime') {
-      clearAnalysisView();
-      analysisLowerTableBody.innerHTML = '';
-      downtimeDisplayActivated = false;
       updateAnalysisModeControls();
-      setAnalysisMessage('Для режима «Простои» задайте интервал времени и нажмите «Отобразить».', false);
+      if (downtimeDisplayActivated) {
+        await renderDowntimeView();
+      } else {
+        clearAnalysisView();
+        analysisLowerTableBody.innerHTML = '';
+        setAnalysisMessage('Для режима «Простои» задайте интервал времени и нажмите «Отобразить».', false);
+      }
       return;
     }
 
@@ -2689,17 +2815,17 @@
   });
 
   analysisFullscreenBtn.addEventListener('click', async () => {
-    if (currentAnalysisMode !== 'minute') return;
+    if (!(currentAnalysisMode === 'minute' || currentAnalysisMode === 'downtime')) return;
 
     try {
-      if (document.fullscreenElement === analysisChartWrap) {
+      if (document.fullscreenElement === analysisTab) {
         await document.exitFullscreen();
       } else {
-        await analysisChartWrap.requestFullscreen();
+        await analysisTab.requestFullscreen();
       }
       updateAnalysisFullscreenButton();
     } catch (error) {
-      setAnalysisMessage('Не удалось переключить полноэкранный режим диаграммы.', true);
+      setAnalysisMessage('Не удалось переключить полноэкранный режим экрана анализа.', true);
     }
   });
 
@@ -2710,6 +2836,57 @@
   document.addEventListener('click', (event) => {
     if (!event.target.closest('.analysis-filter-dropdown')) {
       closeAllAnalysisFilterMenus();
+    }
+  });
+
+  analysisSidebarToggleBtn.addEventListener('click', () => {
+    analysisSidebarCollapsed = !analysisSidebarCollapsed;
+    analysisSidebarToggleBtn.textContent = analysisSidebarCollapsed ? 'Развернуть панель' : 'Свернуть панель';
+    applyAnalysisSidebarState();
+  });
+
+  let isAnalysisSidebarResizing = false;
+  analysisSidebarResizer.addEventListener('mousedown', () => {
+    if (analysisSidebarCollapsed) return;
+    isAnalysisSidebarResizing = true;
+    analysisSidebarResizer.classList.add('active');
+    document.body.style.cursor = 'col-resize';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (isAnalysisSidebarResizing) {
+      isAnalysisSidebarResizing = false;
+      analysisSidebarResizer.classList.remove('active');
+      if (!isResizing && !isAnalysisResizing) {
+        document.body.style.cursor = 'default';
+      }
+    }
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isAnalysisSidebarResizing) return;
+    const mainRect = mainContent.getBoundingClientRect();
+    const relativeX = e.clientX - mainRect.left;
+    const minWidth = 160;
+    const maxWidth = Math.max(minWidth, Math.floor(mainRect.width * 0.45));
+    const nextWidth = Math.min(Math.max(relativeX, minWidth), maxWidth);
+    analysisSidebarWidthPx = nextWidth;
+    analysisSidebar.style.width = `${analysisSidebarWidthPx}px`;
+    analysisSidebar.style.minWidth = `${analysisSidebarWidthPx}px`;
+  });
+
+  analysisTimeFrom.addEventListener('blur', () => {
+    normalizeTimeInputValue(analysisTimeFrom, DEFAULT_TIME_FROM);
+  });
+
+  analysisTimeTo.addEventListener('blur', () => {
+    normalizeTimeInputValue(analysisTimeTo, DEFAULT_TIME_TO);
+  });
+
+  analysisNormTime.addEventListener('blur', () => {
+    normalizeTimeInputValue(analysisNormTime, DEFAULT_DOWNTIME_NORM);
+    if (currentAnalysisMode === 'downtime' && downtimeDisplayActivated) {
+      void renderDowntimeView();
     }
   });
 
@@ -2724,19 +2901,57 @@
 
       if (sectionKey === 'proizvod' || sectionKey === 'proizvod_min' || sectionKey === 'downtime') {
         currentAnalysisMode = sectionKey === 'proizvod_min' ? 'minute' : sectionKey === 'downtime' ? 'downtime' : 'hour';
-        minuteDisplayActivated = false;
-        downtimeDisplayActivated = false;
         updateAnalysisModeControls();
-        await loadProizvodData();
+
+        const routeChanged = lastLoadedDbRoute !== dbRouteSelect.value;
+        const shouldReload = !proizvodRows.length || routeChanged;
+        if (shouldReload) {
+          await loadProizvodData();
+          return;
+        }
+
+        if (currentAnalysisMode === 'downtime') {
+          if (downtimeDisplayActivated) {
+            await renderDowntimeView();
+          } else {
+            clearAnalysisView();
+            analysisLowerTableBody.innerHTML = '';
+            setAnalysisMessage('Для режима «Простои» задайте интервал времени и нажмите «Отобразить».', false);
+          }
+          return;
+        }
+
+        if (currentAnalysisMode === 'minute') {
+          if (minuteDisplayActivated) {
+            renderAnalysisTable(proizvodColumns, proizvodRows);
+            renderCurrentChart();
+          } else {
+            clearAnalysisView();
+            analysisChart.innerHTML = '';
+            setAnalysisMessage('Для режима «Производ (мин)» выберите фильтры и нажмите «Отобразить».', false);
+          }
+          return;
+        }
+
+        renderAnalysisTable(proizvodColumns, proizvodRows);
+        renderCurrentChart();
       } else {
         clearAnalysisView();
-        clearAnalysisChart();
+        analysisChart.innerHTML = '';
+        analysisLowerTableBody.innerHTML = '';
         setAnalysisMessage('Для выбранного раздела отображение ещё не реализовано.', false);
       }
     });
   });
 
+  // Дефолты времени для режима «Простои» доступны сразу в рамках сессии.
+  ensureDowntimeDefaults();
+  analysisSidebarToggleBtn.textContent = 'Свернуть панель';
+
   // Инициализация
+  const activeTab = document.querySelector('.tab.active')?.dataset.tab || 'upload';
+  updateSidebarsByTab(activeTab);
+  bottomBar.style.display = activeTab === 'upload' ? 'flex' : 'none';
   loadDbRoutes();
   renderTables();
 </script>
