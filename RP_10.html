@@ -307,10 +307,10 @@
     }
 
     .splitter {
-      height: 4px;
+      height: 2px;
       background: #e5e7eb;
       border-radius: 999px;
-      margin: 3px 0;
+      margin: 2px 0;
       cursor: row-resize;
       position: relative;
     }
@@ -321,8 +321,8 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      width: 44px;
-      height: 2px;
+      width: 26px;
+      height: 1px;
       border-radius: 999px;
       background: #9ca3af;
     }
@@ -418,9 +418,9 @@
     .analysis-bottom-content {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 6px;
       height: 100%;
-      padding: 10px 10px 0;
+      padding: 4px 0 0;
     }
 
     .analysis-filters {
@@ -459,9 +459,63 @@
       align-self: flex-end;
     }
 
+    .analysis-first-filter-offset {
+      margin-left: 20px;
+    }
+
+    #analysis-tab.analysis-downtime-mode .analysis-filters {
+      padding-left: 20px;
+      box-sizing: border-box;
+    }
+
+    #analysis-tab.analysis-downtime-mode .analysis-first-filter-offset {
+      margin-left: 0;
+    }
+
+    #analysis-tab.analysis-downtime-mode #analysisFioGroup {
+      min-width: 122px;
+      max-width: 187px;
+    }
+
+    #analysis-tab.analysis-downtime-mode #analysisYearGroup,
+    #analysis-tab.analysis-downtime-mode #analysisDateGroup {
+      min-width: 74px;
+      max-width: 113px;
+    }
+
+    #analysis-tab.analysis-downtime-mode #analysisHourGroup {
+      min-width: 92px;
+      max-width: 140px;
+    }
+
+    #analysis-tab.analysis-downtime-mode #analysisWorkGroup {
+      min-width: 122px;
+      max-width: 187px;
+    }
+
+    #analysis-tab.analysis-downtime-mode #analysisFilterBtnFio,
+    #analysis-tab.analysis-downtime-mode #analysisFilterBtnWork {
+      min-width: 122px;
+    }
+
+    #analysis-tab.analysis-downtime-mode #analysisFilterBtnYear,
+    #analysis-tab.analysis-downtime-mode #analysisFilterBtnDate {
+      min-width: 74px;
+    }
+
+    #analysis-tab.analysis-downtime-mode #analysisFilterBtnHour {
+      min-width: 92px;
+    }
+
+    #analysis-tab.analysis-downtime-mode #analysisTimeFrom,
+    #analysis-tab.analysis-downtime-mode #analysisTimeTo {
+      width: 137px;
+    }
+
     .analysis-display-btn {
-      min-width: 80px;
+      min-width: 72px;
       height: 33px;
+      padding: 8px 12px;
     }
 
     .analysis-time-input {
@@ -483,18 +537,15 @@
     .analysis-lower-table-wrap {
       flex: 1;
       border: 1px solid #e5e7eb;
-      border-radius: 6px;
+      border-radius: 0;
       background: #ffffff;
       overflow: auto;
-      padding: 10px 10px 0;
+      padding: 0;
       display: none;
     }
 
     .analysis-lower-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 10px;
+      display: none;
     }
 
     .analysis-row-alert td {
@@ -553,10 +604,11 @@
 
     #analysisNormTime {
       width: 91px;
+      margin-right: -8px;
     }
 
     .analysis-work-group-near {
-      margin-left: -16px;
+      margin-left: -40px;
     }
 
     .analysis-sortable-header {
@@ -720,8 +772,18 @@
       text-overflow: ellipsis;
     }
 
+    #analysis-tab {
+      margin: -16px;
+      height: calc(100% + 32px);
+    }
+
     #analysis-tab .upload-content {
-      padding-bottom: 8px;
+      padding: 4px 0 0;
+      gap: 4px;
+    }
+
+    #analysisBottomPanel .panel-body {
+      padding: 0;
     }
 
     .analysis-chart {
@@ -922,7 +984,7 @@
             <div class="panel-body">
               <div class="analysis-bottom-content">
                 <div class="analysis-filters">
-                  <div class="analysis-filter-group">
+                  <div id="analysisFioGroup" class="analysis-filter-group analysis-first-filter-offset">
                     <div class="settings-label">Сотрудник</div>
                     <div class="analysis-filter-dropdown" data-filter-key="fio">
                       <button id="analysisFilterBtnFio" class="analysis-filter-btn" type="button">Сотрудник: 0/0</button>
@@ -935,7 +997,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="analysis-filter-group analysis-filter-group-compact-25">
+                  <div id="analysisYearGroup" class="analysis-filter-group analysis-filter-group-compact-25">
                     <div class="settings-label">Год</div>
                     <div class="analysis-filter-dropdown" data-filter-key="year">
                       <button id="analysisFilterBtnYear" class="analysis-filter-btn" type="button">Год: 0/0</button>
@@ -961,7 +1023,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="analysis-filter-group analysis-filter-group-compact-25">
+                  <div id="analysisDateGroup" class="analysis-filter-group analysis-filter-group-compact-25">
                     <div class="settings-label">Дата</div>
                     <div class="analysis-filter-dropdown" data-filter-key="date">
                       <button id="analysisFilterBtnDate" class="analysis-filter-btn" type="button">Дата: 0/0</button>
@@ -974,7 +1036,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="analysis-filter-group analysis-filter-group-default-25">
+                  <div id="analysisHourGroup" class="analysis-filter-group analysis-filter-group-default-25">
                     <div class="settings-label">Часы</div>
                     <div class="analysis-filter-dropdown" data-filter-key="hour">
                       <button id="analysisFilterBtnHour" class="analysis-filter-btn" type="button">Часы: 0/0</button>
@@ -999,7 +1061,7 @@
                     <div class="settings-label">Норм ВП</div>
                     <input id="analysisNormTime" class="analysis-time-input" type="text" inputmode="numeric" placeholder="ЧЧ:ММ:СС" value="08:00:00" />
                   </div>
-                  <div class="analysis-filter-group analysis-work-group-near">
+                  <div id="analysisWorkGroup" class="analysis-filter-group analysis-work-group-near">
                     <div class="settings-label">Работа</div>
                     <div class="analysis-filter-dropdown" data-filter-key="work">
                       <button id="analysisFilterBtnWork" class="analysis-filter-btn" type="button">Работа: 0/0</button>
@@ -1021,7 +1083,7 @@
                   <div id="analysisFinalOnlyGroup" class="analysis-filter-group analysis-action-group" style="display: none;">
                     <label class="analysis-inline-toggle" for="analysisFinalOnlyCheckbox">
                       <input id="analysisFinalOnlyCheckbox" type="checkbox" />
-                      <span>Только Финал &gt; 0</span>
+                      <span>&gt;0</span>
                     </label>
                   </div>
                   <div class="analysis-filter-group analysis-action-group" style="max-width: none;">
@@ -1115,6 +1177,7 @@
   let directoryHasUnsavedChanges = false;
   let downtimeNormsMap = new Map();
   let normaDlitMap = new Map();
+  let analysisInitialized = false;
 
   // ========== ✅ УПРАВЛЕНИЕ ЗАКЛАДКАМИ ==========
   const tabs = document.querySelectorAll('.tab');
@@ -1184,6 +1247,16 @@
 
       updateSidebarsByTab(tabId);
       bottomBar.style.display = tabId === 'upload' ? 'flex' : 'none';
+
+      if (tabId === 'analysis' && !analysisInitialized) {
+        analysisInitialized = true;
+        setTimeout(() => {
+          const activeAnalysisItem = document.querySelector('.analysis-radio-item.active');
+          if (activeAnalysisItem) {
+            activeAnalysisItem.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+          }
+        }, 0);
+      }
     });
   });
 
@@ -2194,6 +2267,14 @@
     };
   }
 
+  function getAnalysisDateBaseFromDate(date) {
+    return {
+      day: pad2(date.getDate()),
+      month: pad2(date.getMonth() + 1),
+      year: String(date.getFullYear())
+    };
+  }
+
   function buildAnalysisDateTimeFromBase(dateBase, timeValue) {
     return `${dateBase.day}.${dateBase.month}.${dateBase.year} ${timeValue}`;
   }
@@ -2250,16 +2331,19 @@
 
   function ensureDowntimeDefaults() {
     const selectedDateBase = getSelectedAnalysisDateBase();
-    if (selectedDateBase) {
+    const fromDateTime = parseAnalysisDateTimeValue(analysisTimeFrom.value);
+    const toDateTime = parseAnalysisDateTimeValue(analysisTimeTo.value);
+    const fallbackDateBase = selectedDateBase
+      || (fromDateTime ? getAnalysisDateBaseFromDate(fromDateTime.date) : null)
+      || (toDateTime ? getAnalysisDateBaseFromDate(toDateTime.date) : null);
+
+    if (fallbackDateBase) {
       if (!analysisTimeFrom.value.trim()) {
-        analysisTimeFrom.value = buildAnalysisDateTimeFromBase(selectedDateBase, DEFAULT_TIME_FROM);
+        analysisTimeFrom.value = buildAnalysisDateTimeFromBase(fallbackDateBase, DEFAULT_TIME_FROM);
       }
       if (!analysisTimeTo.value.trim()) {
-        analysisTimeTo.value = buildAnalysisDateTimeFromBase(selectedDateBase, DEFAULT_TIME_TO);
+        analysisTimeTo.value = buildAnalysisDateTimeFromBase(fallbackDateBase, DEFAULT_TIME_TO);
       }
-    } else {
-      if (!analysisTimeFrom.value.trim()) analysisTimeFrom.value = DEFAULT_TIME_FROM;
-      if (!analysisTimeTo.value.trim()) analysisTimeTo.value = DEFAULT_TIME_TO;
     }
     if (!analysisNormTime.value.trim()) analysisNormTime.value = DEFAULT_DOWNTIME_NORM;
   }
@@ -2330,6 +2414,8 @@
     const isMinute = currentAnalysisMode === 'minute';
     const isDowntime = currentAnalysisMode === 'downtime';
 
+    analysisTab.classList.toggle('analysis-downtime-mode', isDowntime);
+
     analysisTimeFromGroup.style.display = isDowntime ? 'flex' : 'none';
     analysisTimeToGroup.style.display = isDowntime ? 'flex' : 'none';
     analysisNormTimeGroup.style.display = isDowntime ? 'flex' : 'none';
@@ -2340,7 +2426,7 @@
       showOnlyFinalPositiveRows = false;
       analysisFinalOnlyCheckbox.checked = false;
     }
-    analysisBottomTitle.textContent = isDowntime ? 'Таблица простоев' : 'График производительности';
+    analysisBottomTitle.textContent = isDowntime ? '' : 'График производительности';
     toggleAnalysisLowerContent(isDowntime ? 'downtime' : 'chart');
     if (isDowntime) {
       ensureDowntimeDefaults();
@@ -3068,24 +3154,55 @@
     ensureDowntimeDefaults();
 
     const selectedDateBase = getSelectedAnalysisDateBase();
-    if (!selectedDateBase) {
-      setAnalysisMessage('Для режима «Простои» выберите дату.', true);
+    const fromDateTimeValue = parseAnalysisDateTimeValue(analysisTimeFrom.value);
+    const toDateTimeValue = parseAnalysisDateTimeValue(analysisTimeTo.value);
+    const fallbackDateBase = selectedDateBase
+      || (fromDateTimeValue ? getAnalysisDateBaseFromDate(fromDateTimeValue.date) : null)
+      || (toDateTimeValue ? getAnalysisDateBaseFromDate(toDateTimeValue.date) : null);
+
+    if (!fallbackDateBase) {
+      setAnalysisMessage('Для режима «Простои» выберите дату или укажите ее в поле «Часы с».', true);
       return null;
     }
 
-    const from = parseAnalysisDateTimeOrTimeValue(analysisTimeFrom.value);
-    if (!from || from.type !== 'datetime') {
+    const fromRaw = analysisTimeFrom.value.trim();
+    let fromTimePart = extractAnalysisTimePart(fromRaw);
+    if (!fromTimePart) {
+      if (!fromRaw) {
+        fromTimePart = DEFAULT_TIME_FROM;
+      } else {
+        setAnalysisMessage('Поле «Часы с» должно быть в формате ДД.ММ.ГГГГ ЧЧ:ММ:СС.', true);
+        return null;
+      }
+    }
+
+    const toRaw = analysisTimeTo.value.trim();
+    let toTimePart = extractAnalysisTimePart(toRaw);
+    if (!toTimePart) {
+      if (!toRaw) {
+        toTimePart = DEFAULT_TIME_TO;
+      } else {
+        setAnalysisMessage('Поле «Часы по» должно быть в формате ДД.ММ.ГГГГ ЧЧ:ММ:СС.', true);
+        return null;
+      }
+    }
+
+    analysisTimeFrom.value = buildAnalysisDateTimeFromBase(fallbackDateBase, fromTimePart);
+    analysisTimeTo.value = buildAnalysisDateTimeFromBase(fallbackDateBase, toTimePart);
+
+    const fromDateTime = parseAnalysisDateTimeValue(analysisTimeFrom.value);
+    if (!fromDateTime) {
       setAnalysisMessage('Поле «Часы с» должно быть в формате ДД.ММ.ГГГГ ЧЧ:ММ:СС.', true);
       return null;
     }
 
-    const to = parseAnalysisDateTimeOrTimeValue(analysisTimeTo.value);
-    if (!to || to.type !== 'datetime') {
+    const toDateTime = parseAnalysisDateTimeValue(analysisTimeTo.value);
+    if (!toDateTime) {
       setAnalysisMessage('Поле «Часы по» должно быть в формате ДД.ММ.ГГГГ ЧЧ:ММ:СС.', true);
       return null;
     }
 
-    if (to.comparableValue < from.comparableValue) {
+    if (toDateTime.timestamp < fromDateTime.timestamp) {
       setAnalysisMessage('Значение «Часы по» должно быть больше либо равно «Часы с».', true);
       return null;
     }
@@ -3096,19 +3213,19 @@
       return null;
     }
 
-    analysisTimeFrom.value = from.formatted;
-    analysisTimeTo.value = to.formatted;
+    analysisTimeFrom.value = fromDateTime.formatted;
+    analysisTimeTo.value = toDateTime.formatted;
     analysisNormTime.value = norm.formatted;
 
     return {
-      timeFrom: from.formatted,
-      timeTo: to.formatted,
-      shiftTime: formatDurationFromSeconds(Math.floor((to.comparableValue - from.comparableValue) / 1000)),
-      shiftSeconds: Math.floor((to.comparableValue - from.comparableValue) / 1000),
+      timeFrom: fromDateTime.formatted,
+      timeTo: toDateTime.formatted,
+      shiftTime: formatDurationFromSeconds(Math.floor((toDateTime.timestamp - fromDateTime.timestamp) / 1000)),
+      shiftSeconds: Math.floor((toDateTime.timestamp - fromDateTime.timestamp) / 1000),
       normTime: norm.formatted,
       normSeconds: norm.totalSeconds,
-      fromTimestamp: from.comparableValue,
-      toTimestamp: to.comparableValue
+      fromTimestamp: fromDateTime.timestamp,
+      toTimestamp: toDateTime.timestamp
     };
   }
 
